@@ -8,23 +8,7 @@ def time_sort(data):
     test_bcid = 0x155
     time_gap = []
     count = 0
-
-#    for each_spp in data:
-#       if each_spp.BCID == test_bcid:
-#            time_gap.append(count)
-#            count = 0
-#        else: #each_spp.BCID != test_bcid:
-#            count += 1
-# 
-#   time_gap = quick_sort(time_gap,len(time_gap))
-
     max_latancy = 512
-
-#    for i in range(1,len(time_gap)):
-#        if (time_gap[i]-time_gap[i-1]) > max_latancy:
-#            max_latancy = time_gap[i] - time_gap[i-1]
-#            latancy_cutoff = time_gap[i] + (0.5 * max_latancy)
-
 
     cycle_count = []
     latancy_count = []
