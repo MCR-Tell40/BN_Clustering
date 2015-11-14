@@ -1,6 +1,8 @@
 from quicksort import quick_sort
 from splitspp import split_spp
-import sys    
+import sys
+from threading import Thread
+from multiprocessing import Process
 
 def time_sort(data):
     test_bcid = 0x155
@@ -54,13 +56,18 @@ def time_sort(data):
         for each_spp in each_bunch:
             final_list.append(each_spp)
 
+    for each_bunch in bcid_collection:
+        for each_spp in each_bunch:
+            final_list.append(each_spp)
+            
     return final_list
                 
-def __main__():
+def run_for_file(core):
+    print 'begining process', core
     for X in reversed(range(0,624)):
-        if X % 3 == int(sys.argv[1]):
+        if X % 3 == core:
             with open('desync' + str(X) + '.txt') as in_file:
-                print 'opening file\t\t', X
+                print 't:', core, '\topening file\t\t', X
                 raw_data = in_file.read()
         
             raw_data = raw_data.split('\n')
@@ -69,14 +76,17 @@ def __main__():
             with open('desync_spp' + str(X) + '.txt', 'w') as out_file:
                 for each_spp in raw_data:
                     out_file.write(each_spp.string + '\n')
-                print 'saving desync_spp\t', X
+                print 't:', core, '\tsaving desync_spp\t', X
 
             raw_data = time_sort(raw_data)
             
             with open('timesync' + str(X) + '.txt', 'w') as out_file:
                 for each_spp in raw_data:
                     out_file.write(each_spp.string + '\n')
-                print 'saving timesync\t\t', X
+                print 't:', core, '\tsaving timesync\t\t', X
 
 if __name__ == '__main__':
-    __main__()
+    for i in range(0,int(sys.argv[1])):
+        p = Process(target=run_for_file, args=(i,)).start()
+    
+
