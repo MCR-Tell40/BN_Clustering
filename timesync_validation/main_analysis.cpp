@@ -43,7 +43,7 @@ int time_analysis::bcid_to_int(bcid data_in)
 spp time_analysis::str_to_spp(std::string in_string)
 {
 	spp out_spp;
-	for (int i(1); i <= 30; i++)
+	for (int i(1); i < 31; i++)
 	{
 		out_spp[30-i] = in_string[i];
 	}	
