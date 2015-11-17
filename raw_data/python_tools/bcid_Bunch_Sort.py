@@ -1,4 +1,4 @@
-from . import *
+from splitspp import *
 import sys
 from multiprocessing import Process
 from copy import deepcopy
@@ -8,8 +8,11 @@ from copy import deepcopy
 def time_sort(data):
     
     # Containers
-    bunch_list = [deepcopy([])]*512 #bcid rotate about 512
+    bunch_list = []
     final_list = []
+    
+    for x in xrange(0,512):
+        bunch_list.append([])
 
     prev_opp = -1 # -1 so initial state is detectable
     for x in range(0,len(data)):
@@ -22,7 +25,7 @@ def time_sort(data):
             prev_opp = opp
 
         #check if bcid is bigger than previos largest
-        if prev_opp < opp:
+        if prev_opp < opp and opp - prev_opp < 256:
             for bcid in range(prev_opp, opp):
                 if len(bunch_list[bcid]) > 0:
                     for spp in bunch_list[bcid]:
@@ -48,25 +51,23 @@ def time_sort(data):
     
 # ----------- file control ----------- # 
 
-def run_for_file(desync_path, timesync_path,core):
+def run_for_file(desync_path, desync_spp_path, timesync_path, core):
     print 'begining process', core
     for X in reversed(range(0,624)):
-        if X % int(sys.argv[1]) == core:
-            with open(desync_path + 'desync' + str(X) + '.txt') as in_file:
+        if X % int(sys.argv[4]) == core:
+            with open(desync_path + '/desync' + str(X) + '.txt') as in_file:
                 print 't:', core, '\topening file\t\t', X
                 raw_data = in_file.read().split('\n')
             raw_data = split_spp(raw_data) 
-        
-            '''
-            with open('desync_spp' + str(X) + '.txt', 'w') as out_file:
+
+            with open(desync_spp_path +'/desync_spp' + str(X) + '.txt', 'w') as out_file:
                 for each_spp in raw_data:
                     out_file.write(each_spp + '\n')
                 print 't:', core, '\tsaving desync_spp\t', X
-            '''
 
             raw_data = time_sort(raw_data)
             
-            with open(timesync_path + 'timesync' + str(X) + '.txt', 'w') as out_file:
+            with open(timesync_path + '/timesync' + str(X) + '.txt', 'w') as out_file:
                 for each_spp in raw_data:
                     out_file.write(each_spp + '\n')
                 print 't:', core, '\tsaving timesync\t\t', X
@@ -74,8 +75,9 @@ def run_for_file(desync_path, timesync_path,core):
 # ----------- main ----------- # 
 
 if __name__ == '__main__':
-    desync_path = argv[1]
-    timesync_path = argv[2]
-    for i in range(0,int(sys.argv[3])):
-        p = Process(target=run_for_file, args=(desync_path, timesync_path,i)).start()
+    desync_path = sys.argv[1]
+    desync_spp_path = sys.argv[2]
+    timesync_path = sys.argv[3]
+    for i in range(0,int(sys.argv[4])):
+        p = Process(target=run_for_file, args=(desync_path, desync_spp_path, timesync_path,i)).start()
         
