@@ -47,7 +47,8 @@ void time_analysis::create_graph()
 
 	bcid_graph = new TGraph(data.size(),x,y);
 
-	delete x,y;
+	delete x;
+	delete y;
 }
 
 int time_analysis::extract_bcid(string data_in)
