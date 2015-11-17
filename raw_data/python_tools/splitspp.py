@@ -6,7 +6,7 @@
 # data = list of frames
 # spp_list = list of spp
 
-from str_to_bin import *
+from conversion import *
 
 def split_spp(data):
 

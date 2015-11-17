@@ -1,5 +1,9 @@
+# Root
+*.root
+
 # Object file
 *.o
+*.pyc
 
 # Emacs files
 *~

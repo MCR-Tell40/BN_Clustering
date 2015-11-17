@@ -2,68 +2,32 @@
 
 using std::cout;
 using std::endl;
-
+using std::string;
+using std::atoi;
 /* time_analysis methods */
 
 time_analysis::time_analysis(const char* file, const char* title):
+file_name(file),
 title(title)
 {
-	infile = new std::fstream(file, std::fstream::in);
+	infile = new std::fstream(file, std::fstream::in);		
+	if (!infile->is_open())
+		std::cout << "File: " << file << " did not open fool!" << endl;
+	
 	read_data_in();
 	create_graph();
-}
-
-time_analysis::~time_analysis()
-{
-	infile->close();
-	delete infile;
-	delete bcid_graph;
-}
-
-bcid time_analysis::extract_bcid(spp data_in)
-{
-	bcid data_out;
-	for(int i(20); i < 30; i++)
-	{
-		data_out[i-20]=data_in[i];
-	} 
-	return data_out;
-}
-
-int time_analysis::bcid_to_int(bcid data_in)
-{
-	int int_out;
-	for(int i(0); i < 9; i++)
-	{
-		int_out += data_in[i] * pow(2,i);
-	}
-	return int_out;
-}
-
-spp time_analysis::str_to_spp(std::string in_string)
-{
-	spp out_spp;
-	for (int i(1); i <= 30; i++)
-	{
-		out_spp[30-i] = in_string[i];
-	}	
-	return out_spp;
 }
 
 void time_analysis::read_data_in()
 {
 	long count(0);
-	while(!infile->eof())
+	std::string buff;
+	while(getline(*infile,buff))
 	{
-		std::string buff;
-		*infile >> buff;
-		
-		if (buff == "") break;
-
-		data.push_back(str_to_spp(buff));
+		data.push_back(buff);
 		count ++;
 
-		if (count % 10000 == 0) cout << count << endl;
+		if (count % 10000 == 0) cout << "File:" << file_name << " : " << count << endl;
 	}
 }
 
@@ -74,15 +38,52 @@ void time_analysis::create_graph()
 
 	for(int i(0); i < data.size(); i++)
 	{
-		y[i] = bcid_to_int(extract_bcid(data[i]));
+		y[i] = extract_bcid(data[i]);
+		#ifdef __debug__
+		cout << data[i] << " : " << data[i].substr(0,9) << " : " << y[i] << endl;
+		#endif
 		x[i] = i;
 	}
 
 	bcid_graph = new TGraph(data.size(),x,y);
+
+	delete x,y;
+}
+
+int time_analysis::extract_bcid(string data_in)
+{
+	return gray_to_int(data_in.substr(0,9));
+}
+
+int time_analysis::gray_to_int(string in_bcid)
+{
+	string out_bcid(blank9);
+	out_bcid[0] = in_bcid[0];
+	for (int i(1); i < 9; i++)
+	{
+		out_bcid[i] = in_bcid[i] != out_bcid[i-1] ? '1' : '0';
+	}
+	return bin_to_int(out_bcid);
+}
+
+int time_analysis::bin_to_int(string data_in)
+{
+	int int_out(0);
+	for(int i(8); i >= 0; i--)
+	{
+		int_out += (data_in[i] == '1' ? 1 : 0) * pow(2,8-i);
+	}
+	return int_out;
+}
+
+time_analysis::~time_analysis()
+{
+	infile->close();
+	delete infile;
+	delete bcid_graph;
 }
 
 /* Help text */
-
 void print_help()
 {
 	cout 	<< "*****************************************" << endl
