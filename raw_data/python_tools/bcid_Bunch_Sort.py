@@ -57,12 +57,12 @@ def run_for_file(desync_path, timesync_path,core):
                 raw_data = in_file.read().split('\n')
             raw_data = split_spp(raw_data) 
         
-'''
+            '''
             with open('desync_spp' + str(X) + '.txt', 'w') as out_file:
                 for each_spp in raw_data:
                     out_file.write(each_spp + '\n')
                 print 't:', core, '\tsaving desync_spp\t', X
-'''
+            '''
 
             raw_data = time_sort(raw_data)
             
