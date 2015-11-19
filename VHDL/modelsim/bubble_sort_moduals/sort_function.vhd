@@ -20,9 +20,9 @@ PACKAGE BODY sort_function IS
 	BEGIN
 		FOR i IN ( 15 downto 8) loop
 
-			IF 		(sppA(i) = '1' AND sppB9i0 = '1') THEN RETURN '0';
-			ELSIF	(sppA(i) = '1' AND sppB9i0 = '0') THEN RETURN '0';
-			ELSE	(sppA(i) = '0' AND sppB9i0 = '1') THEN RETURN '1';
+			IF 		(sppA(i) = '1' AND sppB(i) = '1') THEN RETURN '0';
+			ELSIF	(sppA(i) = '1' AND sppB(i) = '0') THEN RETURN '0';
+			ELSE	(sppA(i) = '0' AND sppB(i) = '1') THEN RETURN '1';
 			END IF;
 			
 		END loop;
