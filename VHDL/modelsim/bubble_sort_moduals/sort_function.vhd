@@ -22,7 +22,7 @@ PACKAGE BODY sort_function IS
 
 			IF 		(sppA(i) = '1' AND sppB9i0 = '1') THEN RETURN '0';
 			ELSIF	(sppA(i) = '1' AND sppB9i0 = '0') THEN RETURN '0';
-			ELSE	(sppA(i) = '1' AND sppB9i0 = '1') THEN RETURN '1';
+			ELSE	(sppA(i) = '0' AND sppB9i0 = '1') THEN RETURN '1';
 			END IF;
 			
 		END loop;
