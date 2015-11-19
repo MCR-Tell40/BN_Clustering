@@ -98,6 +98,9 @@ BEGIN
       switchMadeValid => BubbleSortEven_SwitchMade;
     );
 
+  ------------------------------------------------------------------
+  ---------------------- Control Process ---------------------------
+
   PROCESS(global_clk_160MHz, global_rst)
   BEGIN
 
@@ -114,7 +117,20 @@ BEGIN
       sorting_odd     <= '0';
       sorting_even    <= '0';
 
-    ELSIF rising_edge(csi_Clock_160MHz) THEN     
+    ELSIF rising_edge(global_clk_160MHz) AND BubbleSortEven_SwitchMade = '0' AND BubbleSortOdd_SwitchMade = '0' THEN -- data is sorted
+
+      IF sorting_even = '1' THEN
+        Control_DataOut <= BubbleSortEven_Control;
+
+      ELSIF sorting_odd = '1' THEN
+        Control_DataOut <= BubbleSortOdd_Control;
+
+      END IF;
+
+      Control_RST <= '1'; -- clear sorters
+      ------------------------ NEED TO FIND WAY TO RESET THIS ----------------------
+
+    ELSIF rising_edge(global_clk_160MHz) THEN     
       
       IF sorting_even = '0' AND sorting_odd '0' THEN --start sorting
         Control_BubbleSortEven <= Router_Control;

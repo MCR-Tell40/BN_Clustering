@@ -17,14 +17,17 @@ ENTITY BubbleSort IS
   	clk				: in 	std_logic;
   	rst 			: in 	std_logic;	
 
-    dataIn      	: in 	dataTrain;
+    dataIn      		: in 	dataTrain;
     beginSortValid	: in 	std_logic; -- not convinsed this is needed
 
-    dataOut   		: out 	dataTrain;
-    switchMadeValid : out 	std_logic;
+    dataOut   			: out dataTrain;
+    switchMadeValid : out std_logic;
     switchMadeReset : in 	std_logic
     );
 end BubbleSort;
+
+-------------------------------------------------------------------------------
+---------------------- Even Achitecture ----------------------------------------
 
 architecture even of BubbleSort is
 	-- reset patterns
@@ -69,6 +72,9 @@ begin
 		end if;
 	end process;
 end even;
+
+-------------------------------------------------------------------------------
+---------------------- Odd Achitecture ----------------------------------------
 
 architecture odd of BubbleSort is
 	-- reset patterns
