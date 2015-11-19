@@ -91,8 +91,8 @@ void print_help()
 			<< "** Time Sync File Checker              **" << endl
 			<< "** Argv[1] = desync folder             **" << endl
 			<< "** Argv[2] = timesync folder           **" << endl
-			<< "** Argv[3] = file number               **" << endl
-			<< "** Argv[4] = root file (path and name) **" << endl
+			<< "** Argv[3] = root file dir             **" << endl
+			<< "** Argv[4] = file number               **" << endl
 			<< "*****************************************" << endl
 			<< "******* Built with C++ and coffee *******" << endl;
 }
