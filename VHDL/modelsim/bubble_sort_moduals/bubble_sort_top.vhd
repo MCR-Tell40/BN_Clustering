@@ -10,58 +10,44 @@ use ieee.numeric_std.all;
 -- type def for array of std logic vectors
 TYPE dataTrain IS array (99 downto 0) OF std_logic_vector(29 downto 0);
 
-entity bubble_sort_top is
+entity bubbleSortController is
   port(
     
-    global_rst			: IN    std_logic;
- 	global_clk_40MHz	: IN    std_logic;
-    router_data_in		: IN 	dataTrain;
+    global_rst			    : IN    std_logic;
+ 	  global_clk_160MHz	  : IN    std_logic;
+    router_data_in		  : IN 	  dataTrain;
 
-    sorted_data_out		: OUT 	dataTrain
-
+    sorted_data_out     : OUT 	dataTrain
     );
-end bubble_sort_top;
+end bubbleSortController;
 
-architecture a of bubble_sort_top is
+architecture a of bubbleSortController is
     
 	-- ##### Components ##### --
 
-  	COMPONENT BubbleSortEven IS
+  	COMPONENT BubbleSort IS
  	 	PORT(
   			clk				: in 	std_logic;
   			rst 			: in 	std_logic;	
 
-   			dataIn      	: in 	dataTrain;
+   			dataIn          : in 	dataTrain;
     		beginSortValid	: in 	std_logic; -- not convinsed this is needed
 
-    		dataOut   		: out 	dataTrain;
-    		switchMadeValid : out 	std_logic;
-    		switchMadeReset : in 	std_logic
-   		);
-	END COMPONENT;
-  
-  	COMPONENT BubbleSortOdd IS
- 	 	PORT(
-  			clk				: in 	std_logic;
-  			rst 			: in 	std_logic;	
-
-   			dataIn      	: in 	dataTrain;
-    		beginSortValid	: in 	std_logic; -- not convinsed this is needed
-
-    		dataOut   		: out 	dataTrain;
-    		switchMadeValid : out 	std_logic;
+    		dataOut   		  : out dataTrain;
+    		switchMadeValid : out std_logic;
     		switchMadeReset : in 	std_logic
    		);
 	END COMPONENT;
 
 	-- ##### Data Busses ##### --
 
-	SIGNAL Router_to_BubbleSortEven	: dataTrain;
-	SIGNAL BubbleSortEven_to_Odd	: dataTrain;
-	SIGNAL BubbleSortOdd_to_Even	: dataTrain;
+	SIGNAL Router_Control          	  : dataTrain;
+	SIGNAL BubbleSortEven_Control     : dataTrain;
+	SIGNAL BubbleSortOdd_Control	    : dataTrain;
 
-	SIGNAl BubbleSortEven_out		: datatrain;
-	SIGNAl BubbleSortOdd_out		: datatrain;
+  SIGNAL Conrol_DataOut             : dataTrain;
+  SIGNAL Conrol_BubbleSortEven      : dataTrain;
+  SIGNAL Conrol_BubbleSortOdd       : dataTrain;
 
 	-- ##### Validation Signals ##### --
 
@@ -70,40 +56,22 @@ architecture a of bubble_sort_top is
 
 	-- ##### Clock and Reset ##### --
 
-	SIGNAL clk_160MHz 	: std_logic;
-	SIGNAL rst 			: std_logic;	
+	SIGNAL clk_160MHz  : std_logic;
+	SIGNAL rst 			   : std_logic;	
 
-  
 BEGIN
   
-  
-  -- ##### not yet done ##### --
-  
-  read_inst1 : the_reader
+  BubbleSortOdd : BubbleSort(odd)
     PORT MAP (
-      clk_40MHz         => clock160_reg,
-      rst	        => reset_reg,
-      pixel_read 	=> read_to_descramble
+      clk             => global_clk_40MHz;
+      rst             => global_rst;
       );
-  
-  
-  RX_inst1 : scrambler
-    PORT MAP (
-      rst 	        => reset_reg,
-      clk_160MHz 	=> clock160_reg,
---      data_in           => read_to_descramble,
-      data_in           => "000000000011111111110000000000",
-      data_out  	=> descramble_to_write
-      );		
-  
-  write_inst1 : the_writer
-    PORT MAP (
-      pixel_write       => descramble_to_write,
-      rst	        => reset_reg,
-      clk_40MHz	        => clock160_reg
-      );
-  
 
+  BubbleSortEven : BubbleSort(even)
+    PORT MAP (
+      clk             => global_clk_160MHz;
+      rst             => global_rst;
+      );
 
   PROCESS(csi_Clock_160MHz, rsi_Reset)
   BEGIN
