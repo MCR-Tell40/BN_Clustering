@@ -10,7 +10,7 @@
 #include <bitset>
 #include <math.h>
 
-#define __debug__
+//+#define __debug__
 
 class time_analysis
 {
