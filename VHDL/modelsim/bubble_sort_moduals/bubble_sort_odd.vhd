@@ -26,7 +26,7 @@ ENTITY BubbleSortEven IS
     );
 end BubbleSortEven;
 
-architecture a of BubbleSortEven is
+architecture odd of BubbleSort is
 	-- reset patterns
 	constant reset_patten_spp 	: std_logic_vector(29 down to 0) := (others => '0');
 	constant reset_patten_train : dataTrain := (others => reset_patten_spp);

@@ -9,9 +9,19 @@
 *~
 *#
 
-# Txt files
+# General files
 *.txt
 *.log
+*.bak
+*transcript
 
-#dir's
+# modelsim
+*.mti
+*.mpf
+*.dbg
+*.wlf
+
+# dir's
 steffi_stuff_all/auto-comp-files/
+VHDL/modelsim/bubble_sort_moduals/work/
+
