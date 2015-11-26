@@ -31,3 +31,7 @@ VHDL/modelsim/bubble_sort_moduals/work/
 VHDL/quartus/incremental_db/
 VHDL/quartus/output_files/
 VHDL/quartus/db/
+
+#executables
+timesync_validation/timesyncAnalysis
+data_Train_Size_Analysis/size_analysis
