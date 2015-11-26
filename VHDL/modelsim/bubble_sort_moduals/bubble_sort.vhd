@@ -4,11 +4,11 @@
 -- Date Created 19/11/2015
 
 -- IEEE VHDL standard library:
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+USE ieee.numeric_std.all;
 
-use work.sort_function.all;
+USE work.sort_function.all;
 
 ENTITY BubbleSort IS
 	
@@ -23,44 +23,44 @@ ENTITY BubbleSort IS
   	dataOut   		: out 	dataTrain
   );
 
- end BubbleSort;
+ END BubbleSort;
 
 -----------------------------------------------------------------------
 --------------------------- Even Architecture -------------------------
 
-architecture a of BubbleSort is
+ARCHITECTURE a OF BubbleSort IS
 	-- reset patterns
 	constant reset_patten_spp 	: std_logic_vector(29 downto 0) := (others => '0');
 	constant reset_patten_train : dataTrain := (others => reset_patten_spp);
 
 		
-begin
+BEGIN
 
-	process(parity)
+	PROCESS(parity)
 		VARIABLE mod_value : integer; 
-	begin
-		if parity'event then
-			if parity = '1' then
+	BEGIN
+		IF parity'event THEN
+			IF parity = '1' THEN
 				mod_value := 1;
-			elsif parity = '0' then
+			ELSIF parity = '0' THEN
 				mod_value := 0;
-			end if;
+			END IF;
 			-- itterate over data train
-			for i in 0 to 98 loop
+			FOR i IN 0 to 98 LOOP
 				-- check even
-				if (i mod 2 = mod_value) then
+				IF (i mod 2 = mod_value) THEN
 					-- check if switch is required
-					if (makeSwitch(dataIn(i),dataIn(i+1)) = '1') then
+					IF (makeSwitch(dataIn(i),dataIn(i+1)) = '1') THEN
 						-- make switch
 						dataOut(i) 		<= dataIn(i+1);
 						dataOut(i+1) 	<= dataIn(i);
-					else
+					ELSE
 						-- dont make switch
 						dataOut(i) 		<= dataIn(i);
 						dataOut(i+1) 	<= dataIn(i+1); 
-					end if;
-				end if;
-			end loop;
-		end if;
-	end process;
-end a;
+					END IF;
+				END IF;
+			END LOOP;
+		END IF;
+	END PROCESS;
+END a;

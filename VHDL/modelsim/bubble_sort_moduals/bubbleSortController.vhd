@@ -3,14 +3,14 @@
 -- Author Ben Jeffrey, Nicholas Mead
 -- Date Created 19/11/2015
 
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+USE ieee.numeric_std.all;
 
 use work.sort_function.all;
 
 
-entity bubbleSortController is
+ENTITY bubbleSortController IS
   port(
     
     global_rst			    : IN    std_logic;
@@ -18,23 +18,21 @@ entity bubbleSortController is
     router_data_in		  : IN 	  dataTrain;
     sorted_data_out     : OUT 	dataTrain
   );
-end bubbleSortController;
+END bubbleSortController;
 
-architecture a of bubbleSortController is
+ARCHITECTURE a OF bubbleSortController IS
     
 	-- ##### Components ##### --
-
   COMPONENT BubbleSort IS
  		PORT(
-  		rst 			: in 	std_logic;	
-  		dataIn          : in 	dataTrain;
-      parity          : in  std_logic;
-   		dataOut   		  : out dataTrain
+  		rst 			 : in 	std_logic;	
+  		dataIn     : in 	dataTrain;
+      parity     : in  std_logic;
+   		dataOut    : out dataTrain
   	);
 	END COMPONENT;
 
 	-- ##### Data Busses ##### --
-
 	SIGNAL Router_Control          	  : dataTrain;
 	SIGNAL BubbleSort_Control	        : dataTrain;
 
@@ -42,18 +40,15 @@ architecture a of bubbleSortController is
   SIGNAL Control_BubbleSort         : dataTrain;
 
 	-- ##### Validation Signals ##### --
-
-  SIGNAL Control_Parity               : std_logic;
+  SIGNAL Control_Parity             : std_logic;
 
 	-- ##### Clock and Reset ##### --
-
   SIGNAL Control_RST                : std_logic;
   SIGNAL RST_Control                : std_logic;
 
   -- ##### Reset Constants ##### --
-
-  constant reset_patten_spp   : std_logic_vector(29 downto 0) := (others => '0');
-  constant reset_patten_train : dataTrain := (others => reset_patten_spp);
+  CONSTANT reset_patten_spp         : std_logic_vector(29 downto 0) := (others => '0');
+  CONSTANT reset_patten_train       : dataTrain := (others => reset_patten_spp);
 
 BEGIN
   
@@ -74,20 +69,20 @@ BEGIN
     RST_Control       <= global_rst;	
     Router_Control    <= router_data_in;
 
-    If (RST_Control = '1') THEN 
+    IF (RST_Control = '1') THEN 
       Control_RST     <= RST_Control;
       Control_DataOut <= reset_patten_train;
 
 
     ELSIF rising_edge(global_clk_160MHz) THEN     
-      if BubbleSort_Control = Control_BubbleSort AND Control_Parity = '1' THEN
+      IF BubbleSort_Control = Control_BubbleSort AND Control_Parity = '1' THEN
         BubbleSortOdd_SwitchMade :='0';
-      elsif  BubbleSort_Control = Control_BubbleSort AND Control_Parity = '0' THEN
+      ELSIF  BubbleSort_Control = Control_BubbleSort AND Control_Parity = '0' THEN
         BubbleSortEven_SwitchMade := '0';
-      else
+      ELSE
         BubbleSortEven_SwitchMade :='1';
         BubbleSortOdd_SwitchMade :='1';
-      end if;
+      END IF;
 
       IF BubbleSortEven_SwitchMade = '1' OR BubbleSortOdd_SwitchMade = '1' THEN 
         Control_BubbleSort <= BubbleSort_Control;
