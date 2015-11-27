@@ -9,6 +9,7 @@
 #include <TFile.h>
 
 // #define __debug__
+// #define __ONE_BCID_CYCLE__
 
 int get_bcid(std::string);
 std::string gtob(std::string);
@@ -41,23 +42,23 @@ int main(int argc, char ** argv)
 	TH1F	* overflow_histo_0 = new TH1F(
 		"overflow_histo_0",
 		"overflow histo 0",
-		208,0,623);
+		624,0,624);
 	TH1F	* overflow_histo_50 = new TH1F(
 		"overflow_histo_50",
 		"overflow histo 50",
-		208,0,623);
+		624,0,624);
 	TH1F	* overflow_histo_100 = new TH1F(
 		"overflow_histo_100",
 		"overflow histo 100",
-		208,0,623);
+		624,0,624);
 	TH1F	* overflow_histo_150 = new TH1F(
 		"overflow_histo_150",
 		"overflow histo 150",
-		208,0,623);
+		624,0,624);
 	TH1F	* overflow_histo_200 = new TH1F(
 		"overflow_histo_200",
 		"overflow histo 200",
-		208,0,623);
+		624,0,624);
 
 	//Event counting
 	int count_total(0);
@@ -75,7 +76,8 @@ int main(int argc, char ** argv)
 			std::cout << "opening file: "<< filename.str() << std::endl;
 		#endif
 
-		std::cout << "file: " << i << std::endl;
+		if (i % 100 == 0)
+			std::cout << "file: " << i << "..." <<std::endl;
 
 		std::fstream * in_file = new std::fstream(filename.str().c_str());
 
@@ -106,23 +108,19 @@ int main(int argc, char ** argv)
 					std::cout << "BCID Change" << std::endl;
 				#endif
 
-				// if (bcid_last - bcid > 400 && wait_on)
-				// {
-				// 	wait_on = false;
-				// 	std::cout << "start: " << count << " bcid: " << bcid<< std::endl;
-				// }
-				// else  if (bcid_last - bcid > 400 && !wait_on)
-				// {
-				// 	std::cout << "end: " << count << " bcid: " << bcid<< std::endl;
-				// 	break;
-				// }
+				#ifdef __ONE_BCID_CYCLE__
+					if (bcid_last - bcid > 400 && wait_on)
+						wait_on = false;
+					else  if (bcid_last - bcid > 400 && !wait_on)
+						break;
 
-				// if (wait_on) 
-				// {
-				// 	data.reset();
-				// 	bcid_last = bcid;
-				// 	continue;
-				// }
+					if (wait_on) 
+					{
+						data.reset();
+						bcid_last = bcid;
+						continue;
+					}
+				#endif
 
 				histo->Fill(data.get_size());
 

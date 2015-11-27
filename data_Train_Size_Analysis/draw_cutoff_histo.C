@@ -12,6 +12,14 @@ void draw_cutoff_histo()
 
 	float markerSize = 1;
 
+	int groupSize=3;
+
+	histo0   ->Rebin(groupSize);
+	histo50  ->Rebin(groupSize);
+	histo100 ->Rebin(groupSize);
+	histo150 ->Rebin(groupSize);
+	histo200 ->Rebin(groupSize);
+
 	histo50->Divide(histo50,histo0,1.,1.,"b");
 	histo50->Draw("");
 	histo50->SetMarkerStyle(20);
