@@ -2,6 +2,7 @@ void draw_cutoff_histo()
 {
 	TFile * infile = new TFile ("data_train_length_analysis.root");
 
+	TH1F * histo0 = (TH1F*) infile->Get("overflow_histo_0");
 	TH1F * histo50 = (TH1F*) infile->Get("overflow_histo_50");
 	TH1F * histo100 = (TH1F*) infile->Get("overflow_histo_100");
 	TH1F * histo150 = (TH1F*) infile->Get("overflow_histo_150");
@@ -11,29 +12,33 @@ void draw_cutoff_histo()
 
 	float markerSize = 1;
 
+	histo50->Divide(histo50,histo0,1.,1.,"b");
 	histo50->Draw("");
 	histo50->SetMarkerStyle(20);
 	histo50->SetFillColor(28);
 	histo50->SetLineColor(28);
 	histo50->SetMarkerSize(markerSize);
 
-	histo50->SetTitle("Number of Overflowing BCID Trains");
-	histo50->GetYaxis()->SetTitle("Number of Overflow Trains Per Sensor");
+	histo50->SetTitle("Proportion of Overflowing BCID Trains");
+	histo50->GetYaxis()->SetTitle("Percentage Overflow Per Sensor");
 	histo50->GetXaxis()->SetTitle("ASIC");
 	histo50->SetStats(0);
 
+	histo100->Divide(histo100,histo0,1.,1.,"b");
 	histo100->Draw("same");
 	histo100->SetMarkerStyle(20);
 	histo100->SetLineColor(2);
 	histo100->SetFillColor(2);
 	histo100->SetMarkerSize(markerSize);
 
+	histo150->Divide(histo150,histo0,1.,1.,"b");
 	histo150->Draw("same");
 	histo150->SetMarkerStyle(20);
 	histo150->SetLineColor(4);
 	histo150->SetFillColor(4);
 	histo150->SetMarkerSize(markerSize);
 
+	histo200->Divide(histo200,histo0,1.,1.,"b");
 	histo200->Draw("same");
 	histo200->SetMarkerStyle(20);
 	histo200->SetLineColor(8);

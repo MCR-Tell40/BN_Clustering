@@ -38,6 +38,10 @@ int main(int argc, char ** argv)
 
 	/* Write root file */
 	TFile 	* out_file = new TFile("data_train_length_analysis.root","RECREATE");
+	TH1F	* overflow_histo_0 = new TH1F(
+		"overflow_histo_0",
+		"overflow histo 0",
+		208,0,623);
 	TH1F	* overflow_histo_50 = new TH1F(
 		"overflow_histo_50",
 		"overflow histo 50",
@@ -54,6 +58,13 @@ int main(int argc, char ** argv)
 		"overflow_histo_200",
 		"overflow histo 200",
 		208,0,623);
+
+	//Event counting
+	int count_total(0);
+	int count_50(0);
+	int count_100(0);
+	int count_150(0);
+	int count_200(0);
 
 	for (int i(0); i < 624; i++)
 	{
@@ -73,7 +84,7 @@ int main(int argc, char ** argv)
 		TH1F * histo = new TH1F(
 			histoName.str().c_str(),
 			histoName.str().c_str(),
-			120,0,120
+			250,0,250
 			);
 
 		/* Get data from file and input to histo */
@@ -81,7 +92,6 @@ int main(int argc, char ** argv)
 		int bcid_last(-1);
 		data_train data;
 		bool wait_on = true;
-		int count(0);
 		while(*in_file >> buffer)
 		{
 			#ifdef __debug__
@@ -96,7 +106,7 @@ int main(int argc, char ** argv)
 					std::cout << "BCID Change" << std::endl;
 				#endif
 
-				if (bcid_last - bcid > 400 && wait_on)
+				// if (bcid_last - bcid > 400 && wait_on)
 				// {
 				// 	wait_on = false;
 				// 	std::cout << "start: " << count << " bcid: " << bcid<< std::endl;
@@ -117,16 +127,29 @@ int main(int argc, char ** argv)
 				histo->Fill(data.get_size());
 
 				if (data.get_size() > 200)
+				{
 					overflow_histo_200->Fill(i);
+					count_200++;
+				}
 				if (data.get_size() > 150)
+				{
 					overflow_histo_150->Fill(i);
+					count_150++;
+				}
 				if (data.get_size() > 100)
+				{
 					overflow_histo_100->Fill(i);
+					count_100++;
+				}
 				if (data.get_size() > 50)
+				{
 					overflow_histo_50->Fill(i);
+					count_50++;
+				}
+				overflow_histo_0->Fill(i);
 
 				data.reset();
-				count ++;
+				count_total ++;
 			}
 
 			data.add_spp(buffer);
@@ -142,8 +165,15 @@ int main(int argc, char ** argv)
 	overflow_histo_150->Write();
 	overflow_histo_100->Write();
 	overflow_histo_50->Write();
+	overflow_histo_0->Write();
 	out_file->Close();
 	
+
+	std::cout << "Total Number of Data Trains: " << count_total << std::endl
+		<< "Data Train Length > 50  : " << count_50 << " : " << double(count_50)*100/count_total << "%"<< std::endl
+		<< "Data Train Length > 100 : " << count_100 << " : " << double(count_100)*100/count_total << "%"<< std::endl
+		<< "Data Train Length > 150 : " << count_150 << " : " << double(count_150)*100/count_total << "%"<< std::endl
+		<< "Data Train Length > 200 : " << count_200 << " : " << double(count_200)*100/count_total << "%"<< std::endl;
 	// for (int i(0); i < 10; i++)
 	// 	std::cout << "Blast Off!" << std::endl;
 }
