@@ -9,9 +9,29 @@
 *~
 *#
 
-# Txt files
+# General files
 *.txt
 *.log
+*.bak
+*transcript
 
-#dir's
+# modelsim
+*.mti
+*.mpf
+*.dbg
+*.wlf
+
+#quartus
+*.ipinfo
+*.qsf
+
+# dir's
 steffi_stuff_all/auto-comp-files/
+VHDL/modelsim/bubble_sort_moduals/work/
+VHDL/quartus/incremental_db/
+VHDL/quartus/output_files/
+VHDL/quartus/db/
+
+#executables
+timesync_validation/timesyncAnalysis
+data_Train_Size_Analysis/size_analysis

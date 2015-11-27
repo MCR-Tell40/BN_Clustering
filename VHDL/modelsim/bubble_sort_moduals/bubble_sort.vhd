@@ -4,19 +4,18 @@
 -- Date Created 19/11/2015
 
 -- IEEE VHDL standard library:
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-use work.sort_function.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+USE ieee.numeric_std.all;
 
--- type def for array of std logic vectors
-TYPE dataTrain IS array (99 downto 0) OF std_logic_vector(29 downto 0);
+USE work.sort_function.all;
 
 ENTITY BubbleSort IS
-  PORT(
-  	clk				: in 	std_logic;
-  	rst 			: in 	std_logic;	
+	
 
+  PORT(
+
+<<<<<<< HEAD
     dataIn      		: in 	dataTrain;
     beginSortValid	: in 	std_logic; -- not convinsed this is needed
 
@@ -52,71 +51,56 @@ begin
 						dataOut(i) 		<= dataIn(i+1);
 						dataOut(i+1) 	<= dataIn(i);
 						switchMadeValid <= '1';
+=======
+   	rst 			: in 	std_logic;	
 
-					else
-						-- dont make switch
-						dataOut(i) 		<= dataIn(i);
-						dataOut(i+1) 	<= dataIn(i+1); 
-					end if;
-				end if;
-			end loop;
-		end if;
-	end process;
+   	dataIn      	: in 	dataTrain;
+   	parity 			: in 	std_logic; -- high if odd
+   	clk				: in 	std_logic;
 
-	-- reset the switchMadeValid signal
-	-- called once top level has read the switchMadeValid signal or on rst 
-	process (switchMadeReset, rst)
-	begin
-		if rising_edge(switchMadeReset) OR rst = '1' then
-			switchMadeValid <= '0'
-		end if;
-	end process;
-end even;
+  	dataOut   		: out 	dataTrain
+  );
 
 -------------------------------------------------------------------------------
 ---------------------- Odd Achitecture ----------------------------------------
 
 architecture odd of BubbleSort is
+=======
+ARCHITECTURE a OF BubbleSort IS
+>>>>>>> 04b58fd990210acc573b1e7dfa7f87328b6474ac
 	-- reset patterns
-	constant reset_patten_spp 	: std_logic_vector(29 down to 0) := (others => '0');
+	constant reset_patten_spp 	: std_logic_vector(29 downto 0) := (others => '0');
 	constant reset_patten_train : dataTrain := (others => reset_patten_spp);
-begin
-	--
-	process(clk, rst)
-	begin
-		if rst = '1' then
-			-- Clear output
-			dataOut <= reset_patten_train;
+
 		
-		elsif rising_edge(clk) then 
-			-- itterate over data train
-			for i in (1 to 97) loop
-				-- check even
-				if (i mod 2 = '1') then
-					-- check if switch is required
-					if (makeSwitch(dataIn(i),dataIn(i+1)) = '1') then
-						-- make switch
-						dataOut(i) 		<= dataIn(i+1);
-						dataOut(i+1) 	<= dataIn(i);
-						switchMadeValid <= '1';
+BEGIN
 
-					else
-						-- dont make switch
-						dataOut(i) 		<= dataIn(i);
-						dataOut(i+1) 	<= dataIn(i+1); 
-					end if;
-				end if;
-			end loop;
-		end if;
-	end process;
-
-	-- reset the switchMadeValid signal
-	-- called once top level has read the switchMadeValid signal or on rst 
-	process (switchMadeReset, rst)
-	begin
-		if rising_edge(switchMadeReset) OR rst = '1' then
-			switchMadeValid <= '0'
-		end if;
-	end process;
-end odd;
-
+	PROCESS(parity,clk)
+		VARIABLE mod_value : integer; 
+	BEGIN
+		IF rising_edge(clk) THEN
+			IF parity = '1' THEN
+				mod_value := 1;
+			ELSIF parity = '0' THEN
+				mod_value := 0;
+			END IF;
+		END IF;
+		
+		-- itterate over data train
+		FOR i IN 0 to 98 LOOP
+			-- check even
+			IF (i mod 2 = mod_value) THEN
+				-- check if switch is required
+				IF (makeSwitch(dataIn(i),dataIn(i+1)) = '1') THEN
+					-- make switch
+					dataOut(i) 		<= dataIn(i+1);
+					dataOut(i+1) 	<= dataIn(i);
+				ELSE
+					-- dont make switch
+					dataOut(i) 		<= dataIn(i);
+					dataOut(i+1) 	<= dataIn(i+1); 
+				END IF;
+			END IF;
+		END LOOP;
+	END PROCESS;
+END a;
