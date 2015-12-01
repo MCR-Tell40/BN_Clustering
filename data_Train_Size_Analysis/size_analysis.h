@@ -6,10 +6,11 @@
 #include <fstream>
 #include <sstream>
 #include <TH1F.h>
+#include <TGraph.h>
 #include <TFile.h>
 
-// #define __debug__
-// #define __ONE_BCID_CYCLE__
+//#define __debug__
+//#define __ONE_BCID_CYCLE__
 
 int get_bcid(std::string);
 std::string gtob(std::string);
@@ -37,7 +38,7 @@ int main(int argc, char ** argv)
 		return -1;
 	}
 
-	/* Write root file */
+  	/* Write root file */
 	TFile 	* out_file = new TFile("data_train_length_analysis.root","RECREATE");
 	TH1F	* overflow_histo_0 = new TH1F(
 		"overflow_histo_0",
@@ -60,23 +61,29 @@ int main(int argc, char ** argv)
 		"overflow histo 200",
 		624,0,624);
 
-	//Event counting
-	int count_total(0);
-	int count_50(0);
-	int count_100(0);
-	int count_150(0);
-	int count_200(0);
+  	//Event counting
+	long count_total(0);
+	long count_50(0);
+	long count_100(0);
+	long count_150(0);
+	long count_200(0);
+
+	/* Get data from file and input to histo */
+	std::string buffer;
+	int bcid_last(-1);
+	data_train data;
+	bool wait_on = true;
 
 	for (int i(0); i < 624; i++)
 	{
 		std::stringstream filename;
 		filename << argv[1] << "timesync" << i << ".txt";
 
-		#ifdef __debug__
-			std::cout << "opening file: "<< filename.str() << std::endl;
-		#endif
+	#ifdef __debug__
+		std::cout << "opening file: "<< filename.str() << std::endl;
+	#endif
 
-		if (i % 100 == 0)
+		if (i % 1 == 0)
 			std::cout << "file: " << i << "..." <<std::endl;
 
 		std::fstream * in_file = new std::fstream(filename.str().c_str());
@@ -89,11 +96,6 @@ int main(int argc, char ** argv)
 			250,0,250
 			);
 
-		/* Get data from file and input to histo */
-		std::string buffer;
-		int bcid_last(-1);
-		data_train data;
-		bool wait_on = true;
 		while(*in_file >> buffer)
 		{
 			#ifdef __debug__
@@ -105,7 +107,7 @@ int main(int argc, char ** argv)
 			if (bcid != bcid_last && data.get_size() != 0)
 			{
 				#ifdef __debug__
-					std::cout << "BCID Change" << std::endl;
+				std::cout << "BCID Change" << std::endl;
 				#endif
 
 				#ifdef __ONE_BCID_CYCLE__
@@ -154,9 +156,10 @@ int main(int argc, char ** argv)
 			bcid_last = bcid;
 		}
 
-	
 		out_file->cd();
 		histo->Write();	
+		delete histo;
+		delete in_file;
 	}
 
 	overflow_histo_200->Write();
@@ -168,12 +171,12 @@ int main(int argc, char ** argv)
 	
 
 	std::cout << "Total Number of Data Trains: " << count_total << std::endl
-		<< "Data Train Length > 50  : " << count_50 << " : " << double(count_50)*100/count_total << "%"<< std::endl
-		<< "Data Train Length > 100 : " << count_100 << " : " << double(count_100)*100/count_total << "%"<< std::endl
-		<< "Data Train Length > 150 : " << count_150 << " : " << double(count_150)*100/count_total << "%"<< std::endl
-		<< "Data Train Length > 200 : " << count_200 << " : " << double(count_200)*100/count_total << "%"<< std::endl;
-	// for (int i(0); i < 10; i++)
-	// 	std::cout << "Blast Off!" << std::endl;
+	<< "Data Train Length > 50  : " << count_50 << " : " << double(count_50)*100/count_total << "%"<< std::endl
+	<< "Data Train Length > 100 : " << count_100 << " : " << double(count_100)*100/count_total << "%"<< std::endl
+	<< "Data Train Length > 150 : " << count_150 << " : " << double(count_150)*100/count_total << "%"<< std::endl
+	<< "Data Train Length > 200 : " << count_200 << " : " << double(count_200)*100/count_total << "%"<< std::endl;
+  // for (int i(0); i < 10; i++)
+  // 	std::cout << "Blast Off!" << std::endl;
 }
 
 // ./prog dir_of_source filenumber
