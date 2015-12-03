@@ -135,7 +135,7 @@ void stat_analysis()
 	leg1->SetLineColor(1);
 	leg1->Draw();
 
-	c1->SaveAs("Mean_RMS_ASIC_Graph.png");
+	c1->SaveAs("Mean_RMS_ASIC_Graph.pdf");
 
 	/* top graph */
 	TCanvas * ct = new TCanvas("ct","ct",900,600);
@@ -163,7 +163,7 @@ void stat_analysis()
 	leg2->SetLineColor(1);
 	leg2->Draw();	
 
-	ct->SaveAs("TOP_Mean_RMS_ASIC_Graph.png");
+	ct->SaveAs("TOP_Mean_RMS_ASIC_Graph.pdf");
 
 	/* middle graph */
 	TCanvas * cm = new TCanvas("cm","cm",900,600);
@@ -191,7 +191,7 @@ void stat_analysis()
 	leg3->SetLineColor(1);
 	leg3->Draw();	
 
-	cm->SaveAs("Middle_Mean_RMS_ASIC_Graph.png");
+	cm->SaveAs("Middle_Mean_RMS_ASIC_Graph.pdf");
 
 	/* bottom graph */
 	TCanvas * cb = new TCanvas("cb","cb",900,600);
@@ -219,7 +219,7 @@ void stat_analysis()
 	leg4->SetLineColor(1);
 	leg4->Draw();
 
-	cb->SaveAs("Bottom_Mean_RMS_ASIC_Graph.png");
+	cb->SaveAs("Bottom_Mean_RMS_ASIC_Graph.pdf");
 
 	/* chip id */
 	TCanvas * c_chip = new TCanvas("c_chip","c_chip",900,600);
@@ -278,10 +278,52 @@ void stat_analysis()
 	leg5->SetLineColor(1);
 	leg5->Draw();
 
-	c_chip->SaveAs("Mean_ASIC_Graph_Chip.png");
+	c_chip->SaveAs("Mean_ASIC_Graph_Chip.pdf");
 
 	Graph_0_mean->GetYaxis()->SetRangeUser(0,20);
 
 	c_chip->Update();
-	c_chip->SaveAs("Mean_ASIC_Graph_Chip_lower_values.png");
+	c_chip->SaveAs("Mean_ASIC_Graph_Chip_lower_values.pdf");
+
+	/* ---------------------- ind ASIC histo graphs -------------------- */
+
+	TCanvas * c_multi = new TCanvas("c_multi","c_multi",900,600);
+
+	c_multi -> Divide (2,2);
+
+	TH1F * histo_ASIC_0 = (TH1F*) infile->Get("timesync_0_datatrain_analysis");
+	TH1F * histo_ASIC_20 = (TH1F*) infile->Get("timesync_20_datatrain_analysis");
+	TH1F * histo_ASIC_120 = (TH1F*) infile->Get("timesync_120_datatrain_analysis");
+	TH1F * histo_ASIC_420 = (TH1F*) infile->Get("timesync_420_datatrain_analysis");
+	
+	c_multi->cd(1);
+
+	histo_ASIC_0 -> Draw("");
+	histo_ASIC_0 -> SetTitle("ASIC 0");
+	histo_ASIC_0 -> GetXaxis() -> SetTitle("Data Train Length");
+	histo_ASIC_0 -> GetYaxis() -> SetTitle("Count");
+	
+	c_multi->cd(2);
+
+	histo_ASIC_20 -> Draw();
+	histo_ASIC_20 -> SetTitle("ASIC 20");
+	histo_ASIC_20 -> GetXaxis() -> SetTitle("Data Train Length");
+	histo_ASIC_20 -> GetYaxis() -> SetTitle("Count");
+
+	c_multi->cd(3);
+
+	histo_ASIC_120 -> Draw();
+	histo_ASIC_120 -> SetTitle("ASIC 120");
+	histo_ASIC_120 -> GetXaxis() -> SetTitle("Data Train Length");
+	histo_ASIC_120 -> GetYaxis() -> SetTitle("Count");
+	
+	c_multi->cd(4);
+
+	histo_ASIC_420 -> Draw();
+	histo_ASIC_420 -> SetTitle("ASIC 420");
+	histo_ASIC_420 -> GetXaxis() -> SetTitle("Data Train Length");
+	histo_ASIC_420 -> GetYaxis() -> SetTitle("Count");
+	
+	c_multi->SaveAs("Comparison_of_data_train_length_for_4_ASIC.pdf");
+
 }
