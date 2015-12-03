@@ -24,6 +24,9 @@ END bubbleSortController;
 ARCHITECTURE a OF bubbleSortController IS
     
 	-- ##### Components ##### --
+
+
+
   COMPONENT BubbleSort IS
  		PORT(
   		rst 			 : in 	std_logic;	
@@ -77,16 +80,19 @@ BEGIN
     Router_Control    <= router_data_in;
     Clock_BubbleSort  <= global_clk_160MHz;
     sorted_data_out   <= Control_DataOut;
+    Control_RST       <= RST_Control;
 
     IF (RST_Control = '1') THEN 
-      Control_RST       <= RST_Control;
       Control_DataOut   <= reset_patten_train;
-      process_complete  <= '0';
+      process_complete  <= '1';
+      Control_Parity <= '1';
 
     ELSIF rising_edge(global_clk_160MHz) THEN     
 
       IF process_complete = '1' THEN
+        BubbleSort_Control <= Router_Control;
         process_complete <= '0';
+
       END IF;
 
       IF BubbleSort_Control = Control_BubbleSort AND Control_Parity = '1' THEN
