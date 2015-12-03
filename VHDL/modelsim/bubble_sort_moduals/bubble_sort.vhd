@@ -8,7 +8,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
-USE work.sort_function.all;
+USE work.bubble_sort_package.all;
 
 ENTITY BubbleSort IS
 	
@@ -24,14 +24,13 @@ ENTITY BubbleSort IS
   	dataOut   		: out 	dataTrain
   );
 
+ END ENTITY;
+
 ARCHITECTURE a OF BubbleSort IS
-	-- reset patterns
-	constant reset_patten_spp 	: std_logic_vector(29 downto 0) := (others => '0');
-	constant reset_patten_train : dataTrain := (others => reset_patten_spp);
 		
 BEGIN
 
-	PROCESS(parity,clk)
+	PROCESS(clk)
 		VARIABLE mod_value : integer; 
 	BEGIN
 		IF rising_edge(clk) THEN
