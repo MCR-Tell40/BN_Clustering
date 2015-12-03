@@ -64,5 +64,5 @@ void draw_cutoff_histo()
 	c1->SetLogy();
 	c1->Update();
 
-	c1->SaveAs("Number of Overflowing BCID Trains.png");
+	c1->SaveAs("Number of Overflowing BCID Trains.pdf");
 }
