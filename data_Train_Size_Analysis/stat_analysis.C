@@ -280,4 +280,8 @@ void stat_analysis()
 
 	c_chip->SaveAs("Mean_ASIC_Graph_Chip.png");
 
+	Graph_0_mean->GetYaxis()->SetRangeUser(0,20);
+
+	c_chip->Update();
+	c_chip->SaveAs("Mean_ASIC_Graph_Chip_lower_values.png");
 }
