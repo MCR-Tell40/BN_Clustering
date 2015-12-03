@@ -129,11 +129,11 @@ void stat_analysis()
 	graph_RMS->SetMarkerColor(4);
 	graph_RMS->SetMarkerSize(0.5);
 
-	TLegend * leg = new TLegend(0.7,0.75,0.89,0.89);
-	leg->AddEntry(graph_mean,"Mean Chain Length", "p");
-	leg->AddEntry(graph_RMS,"RMS Chain Length", "p");
-	leg->SetLineColor(1);
-	leg->Draw();
+	TLegend * leg1 = new TLegend(0.7,0.75,0.89,0.89);
+	leg1->AddEntry(graph_mean,"Mean Chain Length", "p");
+	leg1->AddEntry(graph_RMS,"RMS Chain Length", "p");
+	leg1->SetLineColor(1);
+	leg1->Draw();
 
 	c1->SaveAs("Mean_RMS_ASIC_Graph.png");
 
@@ -157,11 +157,11 @@ void stat_analysis()
 	Graph_top_RMS->SetMarkerColor(4);
 	Graph_top_RMS->SetMarkerSize(0.5);
 
-	TLegend * leg = new TLegend(0.7,0.75,0.89,0.89);
-	leg->AddEntry(Graph_top_mean,"Mean Chain Length", "p");
-	leg->AddEntry(Graph_top_RMS,"RMS Chain Length", "p");
-	leg->SetLineColor(1);
-	leg->Draw();	
+	TLegend * leg2 = new TLegend(0.7,0.75,0.89,0.89);
+	leg2->AddEntry(Graph_top_mean,"Mean Chain Length", "p");
+	leg2->AddEntry(Graph_top_RMS,"RMS Chain Length", "p");
+	leg2->SetLineColor(1);
+	leg2->Draw();	
 
 	ct->SaveAs("TOP_Mean_RMS_ASIC_Graph.png");
 
@@ -185,11 +185,11 @@ void stat_analysis()
 	Graph_middle_RMS->SetMarkerColor(4);
 	Graph_middle_RMS->SetMarkerSize(0.5);
 
-	TLegend * leg = new TLegend(0.7,0.75,0.89,0.89);
-	leg->AddEntry(Graph_middle_mean,"Mean Chain Length", "p");
-	leg->AddEntry(Graph_middle_RMS,"RMS Chain Length", "p");
-	leg->SetLineColor(1);
-	leg->Draw();	
+	TLegend * leg3 = new TLegend(0.7,0.75,0.89,0.89);
+	leg3->AddEntry(Graph_middle_mean,"Mean Chain Length", "p");
+	leg3->AddEntry(Graph_middle_RMS,"RMS Chain Length", "p");
+	leg3->SetLineColor(1);
+	leg3->Draw();	
 
 	cm->SaveAs("Middle_Mean_RMS_ASIC_Graph.png");
 
@@ -213,11 +213,11 @@ void stat_analysis()
 	Graph_bottom_RMS->SetMarkerColor(4);
 	Graph_bottom_RMS->SetMarkerSize(0.5);
 
-	TLegend * leg = new TLegend(0.7,0.75,0.89,0.89);
-	leg->AddEntry(Graph_bottom_mean,"Mean Chain Length", "p");
-	leg->AddEntry(Graph_bottom_RMS,"RMS Chain Length", "p");
-	leg->SetLineColor(1);
-	leg->Draw();
+	TLegend * leg4 = new TLegend(0.7,0.75,0.89,0.89);
+	leg4->AddEntry(Graph_bottom_mean,"Mean Chain Length", "p");
+	leg4->AddEntry(Graph_bottom_RMS,"RMS Chain Length", "p");
+	leg4->SetLineColor(1);
+	leg4->Draw();
 
 	cb->SaveAs("Bottom_Mean_RMS_ASIC_Graph.png");
 
@@ -268,16 +268,17 @@ void stat_analysis()
 	Graph_5_mean->SetMarkerColor(8);
 	Graph_5_mean->SetMarkerSize(0.5);
 
-	TLegend * leg = new TLegend(0.7,0.7,0.89,0.89);
-	leg->AddEntry(Graph_0_mean,"Chip ID 0 Length", "p");
-	leg->AddEntry(Graph_1_mean,"Chip ID 1 Length", "p");
-	leg->AddEntry(Graph_2_mean,"Chip ID 2 Length", "p");
-	leg->AddEntry(Graph_3_mean,"Chip ID 3 Length", "p");
-	leg->AddEntry(Graph_4_mean,"Chip ID 4 Length", "p");
-	leg->AddEntry(Graph_5_mean,"Chip ID 5 Length", "p");
-	leg->SetLineColor(1);
-	leg->Draw();
+	TLegend * leg5 = new TLegend(0.7,0.7,0.89,0.89);
+	leg5->AddEntry(Graph_0_mean,"Chip ID 0 Length", "p");
+	leg5->AddEntry(Graph_1_mean,"Chip ID 1 Length", "p");
+	leg5->AddEntry(Graph_2_mean,"Chip ID 2 Length", "p");
+	leg5->AddEntry(Graph_3_mean,"Chip ID 3 Length", "p");
+	leg5->AddEntry(Graph_4_mean,"Chip ID 4 Length", "p");
+	leg5->AddEntry(Graph_5_mean,"Chip ID 5 Length", "p");
+	leg5->SetLineColor(1);
+	leg5->Draw();
 
 	c_chip->SaveAs("Mean_ASIC_Graph_Chip.png");
 
 }
+
