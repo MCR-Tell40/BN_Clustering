@@ -22,63 +22,60 @@ void stat_analysis()
 		mean.push_back(histo->GetMean());
 		RMS .push_back(histo->GetRMS());
 
-		/* seperate graph for diff means */
-		if (i > 100)
+		if(histo->GetMean() > 8)
 		{
-			if(histo->GetMean() > 8)
-			{
-				ASIC_top_mean.push_back(histo->GetMean());
-				ASIC_top_RMS.push_back(histo->GetRMS());
-				ASIC_top_ID.push_back(i);
-			}
-			else if ( (histo->GetMean() > 4.5 && i < 400 ) || (histo->GetMean() > 4 && i >= 400))
-			{
-				ASIC_middle_mean.push_back(histo->GetMean());
-				ASIC_middle_RMS.push_back(histo->GetRMS());
-				ASIC_middle_ID.push_back(i);
-			}
-			else
-			{
-				ASIC_bottom_mean.push_back(histo->GetMean());
-				ASIC_bottom_RMS.push_back(histo->GetRMS());
-				ASIC_bottom_ID.push_back(i);
-			}
-
-			int chip_id = i % 12;
-
-			switch(chip_id)
-			{
-				case 0:
-				ASIC_0_mean.push_back(histo->GetMean());
-				ASIC_0_ID.push_back(i);
-				break;
-
-				case 1:
-				ASIC_1_mean.push_back(histo->GetMean());
-				ASIC_1_ID.push_back(i);
-				break;
-
-				case 2:
-				ASIC_2_mean.push_back(histo->GetMean());
-				ASIC_2_ID.push_back(i);
-				break;
-
-				case 3:
-				ASIC_3_mean.push_back(histo->GetMean());
-				ASIC_3_ID.push_back(i);
-				break;
-
-				case 4:
-				ASIC_4_mean.push_back(histo->GetMean());
-				ASIC_4_ID.push_back(i);
-				break;
-
-				case 5:
-				ASIC_5_mean.push_back(histo->GetMean());
-				ASIC_5_ID.push_back(i);
-				break;
-			}
+			ASIC_top_mean.push_back(histo->GetMean());
+			ASIC_top_RMS.push_back(histo->GetRMS());
+			ASIC_top_ID.push_back(i);
 		}
+		else if ( (histo->GetMean() > 4.5 && i < 400 ) || (histo->GetMean() > 4 && i >= 400))
+		{
+			ASIC_middle_mean.push_back(histo->GetMean());
+			ASIC_middle_RMS.push_back(histo->GetRMS());
+			ASIC_middle_ID.push_back(i);
+		}
+		else
+		{
+			ASIC_bottom_mean.push_back(histo->GetMean());
+			ASIC_bottom_RMS.push_back(histo->GetRMS());
+			ASIC_bottom_ID.push_back(i);
+		}
+
+		int chip_id = i % 12;
+
+		switch(chip_id)
+		{
+			case 0:
+			ASIC_0_mean.push_back(histo->GetMean());
+			ASIC_0_ID.push_back(i);
+			break;
+
+			case 1:
+			ASIC_1_mean.push_back(histo->GetMean());
+			ASIC_1_ID.push_back(i);
+			break;
+
+			case 2:
+			ASIC_2_mean.push_back(histo->GetMean());
+			ASIC_2_ID.push_back(i);
+			break;
+
+			case 3:
+			ASIC_3_mean.push_back(histo->GetMean());
+			ASIC_3_ID.push_back(i);
+			break;
+
+			case 4:
+			ASIC_4_mean.push_back(histo->GetMean());
+			ASIC_4_ID.push_back(i);
+			break;
+
+			case 5:
+			ASIC_5_mean.push_back(histo->GetMean());
+			ASIC_5_ID.push_back(i);
+			break;
+		}
+	
 	}
 
 	/* TGraph stuff because root is a pain in the ass */
@@ -227,6 +224,7 @@ void stat_analysis()
 	/* chip id */
 	TCanvas * c_chip = new TCanvas("c_chip","c_chip",900,600);
 	c_chip -> SetGridy();
+	// c_chip -> SetLogy();
 
 	// Graph_0_mean->Draw("");
 	Graph_0_mean->Draw("A*");
@@ -238,7 +236,7 @@ void stat_analysis()
 	Graph_0_mean->GetYaxis()->SetTitle("Chain Length");
 	Graph_0_mean->GetXaxis()->SetTitle("ASIC");
 	Graph_0_mean->GetXaxis()->SetRangeUser(0,630);
-	Graph_0_mean->GetYaxis()->SetRangeUser(0,20);
+	// Graph_0_mean->GetYaxis()->SetRangeUser(0,150);
 
 	// Graph_1_mean->Draw("same");
 	Graph_1_mean->Draw("same*");
