@@ -28,7 +28,8 @@ void draw_cutoff_histo()
 	histo50->SetMarkerSize(markerSize);
 
 	histo50->SetTitle("Proportion of Overflowing BCID Trains");
-	histo50->GetYaxis()->SetTitle("Percentage Overflow Per Sensor");
+	// histo50->SetTitle(" ");
+	histo50->GetYaxis()->SetTitle("Fraction Overflow Per Sensor");
 	histo50->GetXaxis()->SetTitle("ASIC");
 	histo50->SetStats(0);
 
