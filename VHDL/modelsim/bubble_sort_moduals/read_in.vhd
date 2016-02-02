@@ -49,7 +49,7 @@ architecture r of reader is
   end function stdvec_to_str;
 
 begin
-  process (clk, rst)
+  process (clk)
     
     file file_pointer : text;
     variable line_content : string(1 to 30);
@@ -61,11 +61,8 @@ begin
     
   begin
     file_open(file_pointer,"./spp_sample.txt"   ,READ_MODE);
-    if rst = '1' then
-      out_train <= (others => reset_spp);
-      --valid_out <= '0';
 
-    elsif rising_edge(clk) then	
+    if rising_edge(clk) then	
       
       if (not endfile(file_pointer)) then  
         for i in 0 to 99 loop
@@ -80,7 +77,5 @@ begin
       end if;      
 
     end if;
-    
-
   end process ; 
 END r ;

@@ -24,6 +24,7 @@
 #quartus
 *.ipinfo
 *.qsf
+*.qws
 
 # dir's
 steffi_stuff_all/auto-comp-files/

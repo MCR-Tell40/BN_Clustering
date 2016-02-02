@@ -72,27 +72,31 @@ BEGIN
   ------------------------------------------------------------------
   ---------------------- Control Process ---------------------------
 
+  RST_Control       <= global_rst;  
+  Router_Control    <= router_data_in;
+  Clock_BubbleSort  <= global_clk_160MHz;
+  sorted_data_out   <= Control_DataOut;
+  Control_RST       <= RST_Control;
+
   PROCESS(global_clk_160MHz, global_rst)
     VARIABLE BubbleSortEven_SwitchMade  : std_logic;
     VARIABLE BubbleSortOdd_SwitchMade   : std_logic;
   BEGIN
-    RST_Control       <= global_rst;	
-    Router_Control    <= router_data_in;
-    Clock_BubbleSort  <= global_clk_160MHz;
-    sorted_data_out   <= Control_DataOut;
-    Control_RST       <= RST_Control;
+
 
     IF (RST_Control = '1') THEN 
       Control_DataOut   <= reset_patten_train;
+      Control_BubbleSort <= reset_patten_train;
+      BubbleSort_Control <= reset_patten_train;
       process_complete  <= '1';
       Control_Parity <= '1';
 
     ELSIF rising_edge(global_clk_160MHz) THEN     
 
       IF process_complete = '1' THEN
-        BubbleSort_Control <= Router_Control;
+        Control_BubbleSort <= Router_Control;
         process_complete <= '0';
-
+        Control_Parity <= '1';
       END IF;
 
       IF BubbleSort_Control = Control_BubbleSort AND Control_Parity = '1' THEN
@@ -103,6 +107,7 @@ BEGIN
         BubbleSortEven_SwitchMade :='1';
         BubbleSortOdd_SwitchMade :='1';
       END IF;
+
 
       IF BubbleSortEven_SwitchMade = '1' OR BubbleSortOdd_SwitchMade = '1' THEN 
         Control_BubbleSort <= BubbleSort_Control;
