@@ -35,9 +35,6 @@ BEGIN
 	--dataOut <= inter_reg;
 
 	PROCESS(clk, rst)
-		--VARIABLE mod_value : integer; 
-		CONSTANT reset_patten_spp    : std_logic_vector(29 downto 0) := (others => '0');
-  		CONSTANT reset_patten_train  : dataTrain := (others => reset_patten_spp);
 	BEGIN
 
 		IF rst = '1' THEN
@@ -51,7 +48,7 @@ BEGIN
 				IF ((i mod 2 = 1) AND parity = '1') OR ((i mod 2 = 0) AND parity = '0') THEN
 					report "comparison being made " & integer'image(i);
 					-- check if switch is required
-					IF (to_integer(unsigned(dataIn(i)(15 downto 8))) < to_integer(unsigned(dataIn(i+1)(15 downto 8)))) THEN
+					IF (to_integer(unsigned(dataIn(i)(15 downto 8))) > to_integer(unsigned(dataIn(i+1)(15 downto 8)))) THEN
 						-- make switch
 						report "swapping " & integer'image(i);
 						inter_reg(i) 	:= dataIn(i+1);
