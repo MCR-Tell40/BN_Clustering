@@ -40,10 +40,10 @@ BEGIN
 
 		ELSIF rising_edge(clk) THEN
 
-			IF (to_integer(unsigned(dataIn(1)(15 downto 8))) - to_integer(unsigned(dataIn(0)(15 downto 8)))) > 1 THEN
+			IF (to_integer(unsigned(data_in(1)(15 downto 8))) - to_integer(unsigned(data_in(0)(15 downto 8)))) > 1 THEN
 			
 				-- data_in(0) is isolated
-				inter_reg(0) := data_in(0) & X"80000000";
+				inter_reg(0) := data_in(0) OR x"80_00_00_00";
 			
 			ELSE
 
@@ -51,9 +51,9 @@ BEGIN
 
 			END IF;
 
-			IF (to_integer(unsigned(dataIn(OVERFLOW_SIZE)(15 downto 8))) - to_integer(unsigned(dataIn(OVERFLOW_SIZE-1)(15 downto 8)))) > 1 THEN
+			IF (to_integer(unsigned(data_in(OVERFLOW_SIZE)(15 downto 8))) - to_integer(unsigned(data_in(OVERFLOW_SIZE-1)(15 downto 8)))) > 1 THEN
 
-				inter_reg(OVERFLOW_SIZE) := data_in(OVERFLOW_SIZE) & X"80000000" 
+				inter_reg(OVERFLOW_SIZE) := data_in(OVERFLOW_SIZE) OR x"80_00_00_00";
 
 			ELSE
 
@@ -63,14 +63,14 @@ BEGIN
 
 			FOR i IN 1 to (OVERFLOW_SIZE - 1) LOOP
 
-				IF (to_integer(unsigned(dataIn(i)(15 downto 8))) - to_integer(unsigned(dataIn(i-1)(15 downto 8))) > 1) AND 
-					(to_integer(unsigned(dataIn(i+1)(15 downto 8))) - to_integer(unsigned(dataIn(i)(15 downto 8))) > 1) THEN
+				IF (to_integer(unsigned(data_in(i)(15 downto 8))) - to_integer(unsigned(data_in(i-1)(15 downto 8))) > 1) AND 
+					(to_integer(unsigned(data_in(i+1)(15 downto 8))) - to_integer(unsigned(data_in(i)(15 downto 8))) > 1) THEN
 
-					inter_reg(i) := data_in(OVERFLOW_SIZE) & X"80000000";
+					inter_reg(i) := data_in(i) OR x"80_00_00_00";
 
 				ELSE
 
-					inter_reg(i) := data_in(OVERFLOW_SIZE);
+					inter_reg(i) := data_in(i);
 
 				END IF;
 

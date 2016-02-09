@@ -54,22 +54,20 @@ begin
   process (clk)
     
     file file_pointer : text;
-    variable line_content : string(1 to 30);
+    variable line_content : string(1 to 32);
     variable line_num : line;
     variable j : integer := 0;
     variable char : character:='0'; 
-    variable bin : std_logic_vector(29 downto 0);
-    constant reset_spp : std_logic_vector(29 downto 0) := (others => '0');
+    variable bin : std_logic_vector(31 downto 0);
+    constant reset_spp : std_logic_vector(31 downto 0) := (others => '0');
     variable file_read : integer := 0; 
-    
-        CONSTANT reset_patten_spp    : std_logic_vector(29 downto 0) := (others => '0');
-      CONSTANT reset_patten_train  : dataTrain := (others => reset_patten_spp);
     
   begin
 
     if rst = '1' then
       out_train <= reset_patten_train;
     elsif rising_edge(clk) AND file_read = 0 then	
+      --file_open(file_pointer,"./spp_sample.txt",READ_MODE);
       file_open(file_pointer,"./spp_sample_simple.txt",READ_MODE);
       file_read := 1;
       if (not endfile(file_pointer)) then  
@@ -79,7 +77,7 @@ begin
         	report "line_content =" & line_content;
           bin := str_to_stdvec(line_content);
         	--report "bin" & stdvec_to_str(bin) & "    --->   " & stdvec_to_str(bin(29 downto 0));
-          out_train(i) <= bin;
+          out_train(i) <= bin ;
           --valid_out <= '1';
         end loop;
       end if;      

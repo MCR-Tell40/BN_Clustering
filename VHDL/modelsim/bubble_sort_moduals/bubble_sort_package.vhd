@@ -14,6 +14,8 @@ PACKAGE bubble_sort_package IS
 	-- type def for array of std logic vectors
 	TYPE dataTrain IS ARRAY(OVERFLOW_SIZE downto 0) OF std_logic_vector(31 downto 0);
 
+	CONSTANT reset_patten_spp    : std_logic_vector(31 downto 0) := (others => '0');
+	CONSTANT reset_patten_train  : dataTrain := (others => reset_patten_spp);
 END bubble_sort_package;
 
 PACKAGE BODY bubble_sort_package IS

@@ -19,17 +19,6 @@ END bubble_sort_test_top;
 
 ARCHITECTURE a OF bubble_sort_test_top IS
 
-	COMPONENT bubbleSortController IS
-	  port(    
-	    global_rst			: IN    std_logic;
-	 	global_clk_160MHz	: IN    std_logic;
-	    router_data_in		: IN 	dataTrain;
-	    sorted_data_out     : OUT 	dataTrain;
-	    process_complete    : INOUT std_logic
-	  );
-	END COMPONENT;
-
-
 	COMPONENT reader is
 	  
 	  port(
@@ -40,12 +29,29 @@ ARCHITECTURE a OF bubble_sort_test_top IS
 	    );
 	end COMPONENT ;
 
+	COMPONENT bubbleSortController IS
+	  port(    
+	    global_rst			: IN    std_logic;
+	 	global_clk_160MHz	: IN    std_logic;
+	    router_data_in		: IN 	dataTrain;
+	    sorted_data_out     : OUT 	dataTrain;
+	    process_complete    : INOUT std_logic
+	  );
+	END COMPONENT;
+
+	COMPONENT isolation_flagger IS
+		port(
+			rst 			: IN 	std_logic;	
+   			clk				: IN 	std_logic;
+		   	data_in			: IN 	datatrain;
+	   		data_out		: OUT 	datatrain
+		);
+	END COMPONENT;
+
 	-- SIGNALS
-	signal reader_bubble_train_out, router_data_in, sorted_data_out		: datatrain;
+	signal reader_bubble_train_out, router_data_in, sorted_data_out, flagged_data_out : datatrain;
 	signal process_complete								: std_logic;
   -- ##### Reset Constants ##### --
-	CONSTANT reset_patten_spp    : std_logic_vector(29 downto 0) := (others => '0');
-	CONSTANT reset_patten_train  : dataTrain := (others => reset_patten_spp);
 
 	BEGIN
 
@@ -57,13 +63,21 @@ ARCHITECTURE a OF bubble_sort_test_top IS
 	    );
 
 	    bubbleinst1: bubbleSortController
-	     port map (
+	    port map (
 	       	global_rst			  => test_rst,  
 		 	global_clk_160MHz	  => test_clk,
 		    router_data_in		  => router_data_in,
 		    sorted_data_out		  => sorted_data_out,
 		    process_complete      => process_complete 
-	  );
+	    );
+
+	    flaggerinst1: isolation_flagger
+	    port map (
+	     	rst 		=> test_rst,
+	     	clk 		=> test_clk,
+	     	data_in 	=> sorted_data_out,
+	     	data_out 	=> flagged_data_out
+	    );
 
 	PROCESS(test_clk, test_rst)
 	BEGIN
@@ -71,11 +85,9 @@ ARCHITECTURE a OF bubble_sort_test_top IS
 		if test_rst='1' then
 
 			router_data_in <= reset_patten_train;
-			--process_complete <= '0';
-
+		
 		elsif rising_edge(test_clk) then 
 
-			--process_complete <= '1';
 			router_data_in <= reader_bubble_train_out;
 
 		end if;

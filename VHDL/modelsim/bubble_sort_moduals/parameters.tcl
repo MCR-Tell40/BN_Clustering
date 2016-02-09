@@ -4,6 +4,7 @@ add wave -noupdate -divider Testing\ Top\ Unit
 
 add wave -position end  sim:/bubble_sort_test_top/reader_bubble_train_out
 add wave -position end  sim:/bubble_sort_test_top/sorted_data_out
+add wave -position end  sim:/bubble_sort_test_top/flagged_data_out
 
 add wave -noupdate -divider Bubble\ Sort\ Controler
 
