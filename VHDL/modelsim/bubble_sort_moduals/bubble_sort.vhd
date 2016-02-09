@@ -9,6 +9,7 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
 USE work.bubble_sort_package.all;
+USE work.Detector_Constant_Declaration.all;
 
 ENTITY BubbleSort IS
 	
@@ -27,35 +28,46 @@ ENTITY BubbleSort IS
  END ENTITY;
 
 ARCHITECTURE a OF BubbleSort IS
-		
-BEGIN
+	SHARED VARIABLE inter_reg : dataTrain; --intermediate shift regester
 
-	PROCESS(clk)
-		VARIABLE mod_value : integer; 
+BEGIN
+	
+	dataOut <= inter_reg;
+
+	PROCESS(clk, rst)
+		--VARIABLE mod_value : integer; 
+		CONSTANT reset_patten_spp    : std_logic_vector(29 downto 0) := (others => '0');
+  		CONSTANT reset_patten_train  : dataTrain := (others => reset_patten_spp);
 	BEGIN
-		IF rising_edge(clk) THEN
-			IF parity = '1' THEN
-				mod_value := 1;
-			ELSIF parity = '0' THEN
-				mod_value := 0;
-			END IF;
-		END IF;
-		
-		-- itterate over data train
-		FOR i IN 0 to 98 LOOP
-			-- check even
-			IF (i mod 2 = mod_value) THEN
-				-- check if switch is required
-				IF (makeSwitch(dataIn(i),dataIn(i+1)) = '1') THEN
-					-- make switch
-					dataOut(i) 		<= dataIn(i+1);
-					dataOut(i+1) 	<= dataIn(i);
+
+		IF rst = '1' THEN
+
+			dataOut <= reset_patten_train;
+			inter_reg := reset_patten_train;
+
+		ELSIF rising_edge(clk) THEN
+			FOR i IN 0 to (OVERFLOW_SIZE - 1) LOOP
+				-- check even
+				IF ((i mod 2 = 1) AND parity = '1') OR ((i mod 2 = 0) AND parity = '0') THEN
+					report "comparison being made " & integer'image(i);
+					-- check if switch is required
+					IF (to_integer(unsigned(dataIn(i)(15 downto 8))) < to_integer(unsigned(dataIn(i+1)(15 downto 8)))) THEN
+						-- make switch
+						report "swapping " & integer'image(i);
+						inter_reg(i) 	:= dataIn(i+1);
+						inter_reg(i+1) 	:= dataIn(i);
+					ELSE
+						-- dont make switch
+						report "keeping " & integer'image(i);
+						inter_reg(i) 	:= dataIn(i);
+						inter_reg(i+1) 	:= dataIn(i+1); 
+					END IF;
+
 				ELSE
-					-- dont make switch
-					dataOut(i) 		<= dataIn(i);
-					dataOut(i+1) 	<= dataIn(i+1); 
+					report "skipping comparison " & integer'image(i);
 				END IF;
-			END IF;
-		END LOOP;
+			END LOOP;
+			--dataOut <= inter_reg;
+		END IF;
 	END PROCESS;
 END a;

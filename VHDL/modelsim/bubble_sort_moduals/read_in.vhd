@@ -1,5 +1,5 @@
 -- Name: read_in.vh
--- Author:Nicholas Mead, Ben Jeffrey
+-- Author: Nicholas Mead, Ben Jeffrey
 -- Modified Date: 031215 
 -- Entity name: reader
 -- Description: Reads in 100 SPPs from a timesync file. No controlling for BCID
@@ -8,6 +8,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 use STD.textio.all;
 USE work.bubble_sort_package.all;
+USE work.Detector_Constant_Declaration.all;
 
 entity reader is
   
@@ -48,6 +49,7 @@ architecture r of reader is
     return temp;
   end function stdvec_to_str;
 
+
 begin
   process (clk)
     
@@ -58,14 +60,14 @@ begin
     variable char : character:='0'; 
     variable bin : std_logic_vector(29 downto 0);
     constant reset_spp : std_logic_vector(29 downto 0) := (others => '0');
+    variable file_read : integer := 0; 
     
   begin
-    file_open(file_pointer,"./spp_sample.txt"   ,READ_MODE);
-
-    if rising_edge(clk) then	
-      
+    if rising_edge(clk) AND file_read = 0 then	
+      file_open(file_pointer,"./spp_sample.txt",READ_MODE);
+      file_read := 1;
       if (not endfile(file_pointer)) then  
-        for i in 0 to 99 loop
+        for i in 0 to OVERFLOW_SIZE loop
           readline (file_pointer,line_num);
           read (line_num,line_content);
         	report "line_content =" & line_content;
@@ -75,7 +77,9 @@ begin
           --valid_out <= '1';
         end loop;
       end if;      
-
     end if;
   end process ; 
 END r ;
+
+
+

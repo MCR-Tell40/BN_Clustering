@@ -6,12 +6,13 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
+USE work.Detector_Constant_Declaration.all; 
 
 -- Define Package
 PACKAGE bubble_sort_package IS 
 
-  	-- type def for array of std logic vectors
-	TYPE dataTrain IS ARRAY(99 downto 0) OF std_logic_vector(29 downto 0);
+	-- type def for array of std logic vectors
+	TYPE dataTrain IS ARRAY(OVERFLOW_SIZE downto 0) OF std_logic_vector(29 downto 0);
 
 	-- For sorted data B > A, Returns '1' if switch is required
 	FUNCTION makeSwitch(sppA, sppB : std_logic_vector(29 downto 0)) RETURN std_logic;
