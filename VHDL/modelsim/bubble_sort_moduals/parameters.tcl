@@ -1,21 +1,28 @@
+vsim -novopt work.bubble_sort_test_top
 
-add wave -position end  sim:/bubblesortcontroller/global_rst
-add wave -position end  sim:/bubblesortcontroller/global_clk_160MHz
-add wave -position end  sim:/bubblesortcontroller/router_data_in
-add wave -position end  sim:/bubblesortcontroller/sorted_data_out
-add wave -position end  sim:/bubblesortcontroller/Router_Control
-add wave -position end  sim:/bubblesortcontroller/BubbleSort_Control
-add wave -position end  sim:/bubblesortcontroller/Control_DataOut
-add wave -position end  sim:/bubblesortcontroller/Control_BubbleSort
-add wave -position end  sim:/bubblesortcontroller/Control_Parity
-add wave -position end  sim:/bubblesortcontroller/Control_RST
-add wave -position end  sim:/bubblesortcontroller/RST_Control
-add wave -position end  sim:/bubblesortcontroller/reset_patten_spp
-add wave -position end  sim:/bubblesortcontroller/reset_patten_train
+add wave -noupdate -divider Testing\ Top\ Unit
 
+add wave -position end  sim:/bubble_sort_test_top/reader_bubble_train
+add wave -position end  sim:/bubble_sort_test_top/bubble_sorted_train
 
-force -freeze sim:/bubblesortcontroller/global_clk_160MHz 1 0, 0 {3125 ps} -r 6.25ns
-force -freeze sim:/bubblesortcontroller/global_rst 1 0
-force -freeze sim:/bubblesortcontroller/global_rst 0 1ns
+add wave -noupdate -divider Bubble\ Sort\ Controler
+
+add wave -position end  sim:/bubble_sort_test_top/sorted_signal
+add wave -position end  sim:/bubble_sort_test_top/test_clk
+add wave -position end  sim:/bubble_sort_test_top/test_rst
+
+add wave -noupdate -divider Sorting\ Signals
+
+add wave -position end sim:/bubble_sort_test_top/bubbleinst1/Router_Control
+add wave -position end sim:/bubble_sort_test_top/bubbleinst1/Control_Bubblesort
+add wave -position end sim:/bubble_sort_test_top/bubbleinst1/BubbleSortInst1/inter_reg
+add wave -position end sim:/bubble_sort_test_top/bubbleinst1/Bubblesort_Control
+add wave -position end sim:/bubble_sort_test_top/bubbleinst1/Control_DataOut
+
+add wave -position end sim:/bubble_sort_test_top/bubbleinst1/Control_Parity
+
+force -freeze sim:/bubble_sort_test_top/test_clk 1 0, 0 {3125 ps} -r 6.25ns
+force -freeze sim:/bubble_sort_test_top/test_rst 1 0
+force -freeze sim:/bubble_sort_test_top/test_rst 0 23ns
 
 

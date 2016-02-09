@@ -7,7 +7,8 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
-use work.sort_function.all;
+use work.bubble_sort_package.all;
+USE work.Detector_Constant_Declaration.all;
 
 
 ENTITY bubbleSortController IS
@@ -24,6 +25,7 @@ END bubbleSortController;
 ARCHITECTURE a OF bubbleSortController IS
     
 	-- ##### Components ##### --
+
   COMPONENT BubbleSort IS
  		PORT(
   		rst 			 : in 	std_logic;	
@@ -64,36 +66,47 @@ BEGIN
       dataOut         => BubbleSort_Control
     );
 
-  Control_Parity <= '0';
+  --Control_Parity <= '0';
+
+  ------------------------------------------------------------------
+  ---------------------- Control Process ---------------------------
+
+  RST_Control       <= global_rst;  
+  Router_Control    <= router_data_in;
+  Clock_BubbleSort  <= global_clk_160MHz;
+  sorted_data_out   <= Control_DataOut;
+  Control_RST       <= RST_Control;
 
   PROCESS(global_clk_160MHz, global_rst)
     VARIABLE BubbleSortEven_SwitchMade  : std_logic;
     VARIABLE BubbleSortOdd_SwitchMade   : std_logic;
   BEGIN
-    RST_Control       <= global_rst;	
-    Router_Control    <= router_data_in;
-    Clock_BubbleSort  <= global_clk_160MHz;
-    sorted_data_out   <= Control_DataOut;
+
 
     IF (RST_Control = '1') THEN 
-      Control_RST       <= RST_Control;
       Control_DataOut   <= reset_patten_train;
-      process_complete  <= '0';
+      Control_BubbleSort <= reset_patten_train;
+      --BubbleSort_Control <= reset_patten_train;
+      process_complete  <= '1';
+      Control_Parity <= '1';
 
     ELSIF rising_edge(global_clk_160MHz) THEN     
 
       IF process_complete = '1' THEN
+        --Control_BubbleSort <= Router_Control;
         process_complete <= '0';
+        --Control_Parity <= '1';
       END IF;
 
-      IF BubbleSort_Control = Control_BubbleSort AND Control_Parity = '1' THEN
+      IF BubbleSort_Control = Control_BubbleSort AND Control_Parity = '1' AND process_complete = '0' THEN
         BubbleSortOdd_SwitchMade :='0';
-      ELSIF  BubbleSort_Control = Control_BubbleSort AND Control_Parity = '0' THEN
+      ELSIF  BubbleSort_Control = Control_BubbleSort AND Control_Parity = '0' AND process_complete = '0' THEN
         BubbleSortEven_SwitchMade := '0';
       ELSE
         BubbleSortEven_SwitchMade :='1';
         BubbleSortOdd_SwitchMade :='1';
       END IF;
+
 
       IF BubbleSortEven_SwitchMade = '1' OR BubbleSortOdd_SwitchMade = '1' THEN 
         Control_BubbleSort <= BubbleSort_Control;
@@ -102,6 +115,7 @@ BEGIN
         Control_DataOut <= BubbleSort_Control;
         process_complete <= '1';
         Control_BubbleSort <= Router_Control;
+        Control_Parity <= NOT Control_Parity;
 
       END IF; 
 

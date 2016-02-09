@@ -55,7 +55,7 @@ int main(int argc, char ** argv)
 				)
 				print_help();
 		
-		{`
+		{
 			std::string desync_file   = std::string(argv[1]) + "desync_spp" + std::string(argv[4]) + ".txt";
 			std::string timesync_file = std::string(argv[2]) + "timesync" + std::string(argv[4]) + ".txt";
 			std::string root_file_name =  std::string(argv[3]) + "asic" + std::string(argv[4]) + "_bcid_order.root";
