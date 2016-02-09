@@ -62,9 +62,15 @@ begin
     constant reset_spp : std_logic_vector(29 downto 0) := (others => '0');
     variable file_read : integer := 0; 
     
+        CONSTANT reset_patten_spp    : std_logic_vector(29 downto 0) := (others => '0');
+      CONSTANT reset_patten_train  : dataTrain := (others => reset_patten_spp);
+    
   begin
-    if rising_edge(clk) AND file_read = 0 then	
-      file_open(file_pointer,"./spp_sample.txt",READ_MODE);
+
+    if rst = '1' then
+      out_train <= reset_patten_train;
+    elsif rising_edge(clk) AND file_read = 0 then	
+      file_open(file_pointer,"./spp_sample_simple.txt",READ_MODE);
       file_read := 1;
       if (not endfile(file_pointer)) then  
         for i in 0 to OVERFLOW_SIZE loop

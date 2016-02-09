@@ -41,8 +41,11 @@ ARCHITECTURE a OF bubble_sort_test_top IS
 	end COMPONENT ;
 
 	-- SIGNALS
-	signal reader_bubble_train, bubble_sorted_train		: datatrain;
-	signal sorted_signal								: std_logic;
+	signal reader_bubble_train_out, router_data_in, sorted_data_out		: datatrain;
+	signal process_complete								: std_logic;
+  -- ##### Reset Constants ##### --
+	CONSTANT reset_patten_spp    : std_logic_vector(29 downto 0) := (others => '0');
+	CONSTANT reset_patten_train  : dataTrain := (others => reset_patten_spp);
 
 	BEGIN
 
@@ -50,17 +53,33 @@ ARCHITECTURE a OF bubble_sort_test_top IS
 	   	PORT MAP (
 	    	rst             => test_rst,
 	    	clk             => test_clk,
-	    	out_train       => reader_bubble_train
+	    	out_train       => reader_bubble_train_out
 	    );
 
 	    bubbleinst1: bubbleSortController
 	     port map (
 	       	global_rst			  => test_rst,  
 		 	global_clk_160MHz	  => test_clk,
-		    router_data_in		  => reader_bubble_train,
-		    sorted_data_out		  => bubble_sorted_train,
-		    process_complete      => sorted_signal 
+		    router_data_in		  => router_data_in,
+		    sorted_data_out		  => sorted_data_out,
+		    process_complete      => process_complete 
 	  );
 
+	PROCESS(test_clk, test_rst)
+	BEGIN
+
+		if test_rst='1' then
+
+			router_data_in <= reset_patten_train;
+			--process_complete <= '0';
+
+		elsif rising_edge(test_clk) then 
+
+			--process_complete <= '1';
+			router_data_in <= reader_bubble_train_out;
+
+		end if;
+
+	END PROCESS;
 END a;
 
