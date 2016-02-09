@@ -24,17 +24,16 @@ def split_spp(data):
             break
         else:
             
-            frame = frame[::-1]
+            rev_frame = frame[:7:-1]
 
-
-            spp_list.append(frame[38:8:-1])
-            spp_list.append(frame[68:38:-1])
-            spp_list.append(frame[98:68:-1])
-            spp_list.append(frame[128:98:-1])
+            spp_list.append(rev_frame[0:30])
+            spp_list.append(rev_frame[30:60])
+            spp_list.append(rev_frame[60:90])
+            spp_list.append(rev_frame[90:120])
 
     read_out = []
     for spp in spp_list:
-        if btoi(spp[22:]) > 0:
+        if btoi(spp[:22]) > 0:
             read_out.append(spp)
             
     return read_out
