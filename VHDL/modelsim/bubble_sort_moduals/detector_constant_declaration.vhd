@@ -110,6 +110,8 @@ PACKAGE Detector_Constant_Declaration IS
 --
   -- Event Isolation Flagging
   constant OVERFLOW_SIZE: INTEGER := 9; -- max significant bit
+  CONSTANT reset_patten_spp    : std_logic_vector(31 downto 0) := (others => '0');
+  CONSTANT reset_patten_train  : dataTrain := (others => reset_patten_spp);
 
 
 END Detector_Constant_Declaration;

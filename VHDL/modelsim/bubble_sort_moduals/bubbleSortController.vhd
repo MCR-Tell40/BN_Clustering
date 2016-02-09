@@ -51,10 +51,6 @@ ARCHITECTURE a OF bubbleSortController IS
   SIGNAL RST_Control           : std_logic;
   SIGNAL Clock_BubbleSort      : std_logic;
 
-  -- ##### Reset Constants ##### --
-  CONSTANT reset_patten_spp    : std_logic_vector(29 downto 0) := (others => '0');
-  CONSTANT reset_patten_train  : dataTrain := (others => reset_patten_spp);
-
 BEGIN
   
   BubbleSortInst1 : BubbleSort
