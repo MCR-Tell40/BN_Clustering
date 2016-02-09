@@ -32,7 +32,7 @@ ARCHITECTURE a OF BubbleSort IS
 
 BEGIN
 	
-	dataOut <= inter_reg;
+	--dataOut <= inter_reg;
 
 	PROCESS(clk, rst)
 		--VARIABLE mod_value : integer; 
@@ -62,12 +62,16 @@ BEGIN
 						inter_reg(i) 	:= dataIn(i);
 						inter_reg(i+1) 	:= dataIn(i+1); 
 					END IF;
-
 				ELSE
 					report "skipping comparison " & integer'image(i);
 				END IF;
 			END LOOP;
-			--dataOut <= inter_reg;
+
+			IF parity = '1' THEN
+				inter_reg(0) := dataIn(0);
+				inter_reg(OVERFLOW_SIZE) := dataIn(OVERFLOW_SIZE);
+			END IF;
+			dataOut <= inter_reg;
 		END IF;
 	END PROCESS;
 END a;
