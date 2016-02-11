@@ -88,14 +88,13 @@ BEGIN
 
     ELSIF rising_edge(global_clk_160MHz) THEN     
 
-      IF process_complete = '1' THEN
-        process_complete <= '0';
-      ELSIF Comparison_count = OVERFLOW_SIZE THEN
+      IF Comparison_count = OVERFLOW_SIZE THEN
         process_complete <= '1';
         Comparison_count := 0;
         Control_DataOut <= BubbleSort_Control;
         Control_BubbleSort <= Router_Control;
       ELSE
+        process_complete <= '0';
         Comparison_count := Comparison_count + 1;
         Control_BubbleSort <= BubbleSort_Control;
       END IF;

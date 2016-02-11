@@ -48,7 +48,7 @@ BEGIN
 				IF ((i mod 2 = 1) AND parity = '1') OR ((i mod 2 = 0) AND parity = '0') THEN
 					report "comparison being made " & integer'image(i);
 					-- check if switch is required
-					IF (to_integer(unsigned(dataIn(i)(15 downto 8))) > to_integer(unsigned(dataIn(i+1)(15 downto 8)))) THEN
+					IF (to_integer(unsigned(dataIn(i)(13 downto 8))) > to_integer(unsigned(dataIn(i+1)(13 downto 8)))) THEN
 						-- make switch
 						report "swapping " & integer'image(i);
 						inter_reg(i) 	:= dataIn(i+1);

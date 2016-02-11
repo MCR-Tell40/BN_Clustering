@@ -126,22 +126,22 @@ int main(int argc, char ** argv)
 
 				histo->Fill(data.get_size());
 
-				if (data.get_size() > 200)
+				if (data.get_size() > 64)
 				{
 					overflow_histo_200->Fill(i);
 					count_200++;
 				}
-				if (data.get_size() > 150)
+				if (data.get_size() > 32)
 				{
 					overflow_histo_150->Fill(i);
 					count_150++;
 				}
-				if (data.get_size() > 100)
+				if (data.get_size() > 16)
 				{
 					overflow_histo_100->Fill(i);
 					count_100++;
 				}
-				if (data.get_size() > 50)
+				if (data.get_size() > 8)
 				{
 					overflow_histo_50->Fill(i);
 					count_50++;

@@ -55,15 +55,15 @@ void draw_cutoff_histo()
 	histo200->SetMarkerSize(markerSize);
 
 	TLegend * leg = new TLegend(0.7,0.7,0.89,0.89);
-	leg->AddEntry(histo50,"Cut Off 50", "f");
-	leg->AddEntry(histo100,"Cut Off 100", "f");
-	leg->AddEntry(histo150,"Cut Off 150", "f");
-	leg->AddEntry(histo200,"Cut Off 200", "f");
+	leg->AddEntry(histo50,"Cut Off 8", "f");
+	leg->AddEntry(histo100,"Cut Off 16", "f");
+	leg->AddEntry(histo150,"Cut Off 32", "f");
+	leg->AddEntry(histo200,"Cut Off 64", "f");
 	leg->SetLineColor(0);
 	leg->Draw();
 
 	c1->SetLogy();
 	c1->Update();
 
-	c1->SaveAs("Number_of_Overflowing_BCID_Trains.pdf");
+	c1->SaveAs("Number_of_Overflowing_BCID_Trains_binary.pdf");
 }
