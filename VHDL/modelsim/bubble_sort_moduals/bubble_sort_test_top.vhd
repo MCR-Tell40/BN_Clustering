@@ -34,6 +34,7 @@ ARCHITECTURE a OF bubble_sort_test_top IS
 	    global_rst			: IN    std_logic;
 	 	global_clk_160MHz	: IN    std_logic;
 	    router_data_in		: IN 	dataTrain;
+	    train_size 			: IN 	std_logic_vector(7 downto 0);
 	    sorted_data_out     : OUT 	dataTrain;
 	    process_complete    : INOUT std_logic
 	  );
@@ -68,6 +69,7 @@ ARCHITECTURE a OF bubble_sort_test_top IS
 		 	global_clk_160MHz	  => test_clk,
 		    router_data_in		  => router_data_in,
 		    sorted_data_out		  => sorted_data_out,
+		    train_size 			  => x"0A",
 		    process_complete      => process_complete 
 	    );
 
