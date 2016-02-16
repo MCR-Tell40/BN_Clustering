@@ -38,7 +38,7 @@ ARCHITECTURE a OF bubbleSortController IS
   	);
 	END COMPONENT;
 
-  COMPONENT counter IS
+  COMPONENT counter_8bit IS
     PORT(
     clk   :   IN std_logic;
     rst   :   IN std_logic;
@@ -62,11 +62,11 @@ ARCHITECTURE a OF bubbleSortController IS
   SIGNAL RST_Control           : std_logic;
   SIGNAL Clock_BubbleSort      : std_logic;
 
-  -- ##### counter ##### --
-  SIGNAL counter_enable        : std_logic;
-  SIGNAL counter_value         : std_logic_vector(7 downto 0);
-  SIGNAL counter_reset         : std_logic;
-  SIGNAL counter_reset_global  : std_logic;
+  -- ##### counter_8bit ##### --
+  SIGNAL counter_8bit_enable        : std_logic;
+  SIGNAL counter_8bit_value         : std_logic_vector(7 downto 0);
+  SIGNAL counter_8bit_reset         : std_logic;
+  SIGNAL counter_8bit_reset_global  : std_logic;
 
 BEGIN
   
@@ -79,12 +79,12 @@ BEGIN
       dataOut         => BubbleSort_Control
     );
 
-  counterInst1 : counter
+  counter_8bit_Inst1 : counter_8bit
     PORT MAP (
       clk   => Clock_BubbleSort,
-      rst   => counter_reset_global,
-      en    => counter_enable,
-      count => counter_value
+      rst   => counter_8bit_reset_global,
+      en    => counter_8bit_enable,
+      count => counter_8bit_value
       );
 
   ------------------------------------------------------------------
@@ -98,10 +98,10 @@ BEGIN
   Control_RST       <= RST_Control;
 
 
-  --counter
-  counter_enable <= '1';
+  --counter_8bit
+  counter_8bit_enable <= '1';
 
-  counter_reset_global <= counter_reset OR Control_RST;
+  counter_8bit_reset_global <= counter_8bit_reset OR Control_RST;
 
   PROCESS(global_clk_160MHz, global_rst)
     --VARIABLE BubbleSortEven_SwitchMade  : std_logic;
@@ -117,14 +117,14 @@ BEGIN
 
     ELSIF rising_edge(global_clk_160MHz) THEN     
 
-      IF (counter_value = train_size - 1) THEN
+      IF (counter_8bit_value = train_size - 1) THEN
         process_complete <= '1';
-        counter_reset <= '1';
+        counter_8bit_reset <= '1';
         Control_DataOut <= BubbleSort_Control;
         Control_BubbleSort <= Router_Control;
       ELSE
         process_complete <= '0';
-        counter_reset <= '0';
+        counter_8bit_reset <= '0';
         Control_BubbleSort <= BubbleSort_Control;
       END IF;
 
