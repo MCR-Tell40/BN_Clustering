@@ -7,6 +7,8 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 use work.Isolation_Flagging_Package.all;
+USE IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 USE work.Detector_Constant_Declaration.all;
 
 
@@ -16,6 +18,7 @@ ENTITY Isolation_Flagging_Sort_Controller IS
     global_rst			    : IN    std_logic;
  	  global_clk_160MHz	  : IN    std_logic;
     router_data_in		  : IN 	  dataTrain;
+    train_size          : IN    std_logic_vector(7 downto 0);
     sorted_data_out     : OUT 	dataTrain;
     process_complete    : INOUT   std_logic
   );
@@ -35,6 +38,15 @@ ARCHITECTURE a OF Isolation_Flagging_Sort_Controller IS
   	);
 	END COMPONENT;
 
+  COMPONENT counter_8bit IS
+    PORT(
+    clk   :   IN std_logic;
+    rst   :   IN std_logic;
+    en    :   IN std_logic;
+    count :   OUT std_logic_vector(7 downto 0)
+    );
+  END COMPONENT;
+
 	-- ##### Data Busses ##### --
 	SIGNAL Router_Control        : dataTrain;
 	SIGNAL BubbleSort_Control	   : dataTrain;
@@ -50,6 +62,12 @@ ARCHITECTURE a OF Isolation_Flagging_Sort_Controller IS
   SIGNAL RST_Control           : std_logic;
   SIGNAL Clock_BubbleSort      : std_logic;
 
+  -- ##### counter_8bit ##### --
+  SIGNAL counter_8bit_enable        : std_logic;
+  SIGNAL counter_8bit_value         : std_logic_vector(7 downto 0);
+  SIGNAL counter_8bit_reset         : std_logic;
+  SIGNAL counter_8bit_reset_global  : std_logic;
+
 BEGIN
   
   BubbleSortInst1 : Isolation_Flagging_Sort_Unit
@@ -61,39 +79,49 @@ BEGIN
       dataOut         => BubbleSort_Control
     );
 
-  --Control_Parity <= '0';
+  counter_8bit_Inst1 : counter_8bit
+    PORT MAP (
+      clk   => Clock_BubbleSort,
+      rst   => counter_8bit_reset_global,
+      en    => counter_8bit_enable,
+      count => counter_8bit_value
+      );
 
   ------------------------------------------------------------------
   ---------------------- Control Process ---------------------------
 
+  -- sorter
   RST_Control       <= global_rst;  
   Router_Control    <= router_data_in;
   Clock_BubbleSort  <= global_clk_160MHz;
   sorted_data_out   <= Control_DataOut;
   Control_RST       <= RST_Control;
 
-  PROCESS(global_clk_160MHz, global_rst)
-    VARIABLE Comparison_count : integer;
-  BEGIN
 
+  --counter_8bit
+  counter_8bit_enable <= '1';
+
+  counter_8bit_reset_global <= counter_8bit_reset OR Control_RST;
+
+  PROCESS(global_clk_160MHz, global_rst)
+  BEGIN
 
     IF (RST_Control = '1') THEN 
       Control_DataOut   <= reset_patten_train;
       Control_BubbleSort <= reset_patten_train;
       process_complete  <= '1';
       Control_Parity <= '1';
-      Comparison_count := 0;
 
     ELSIF rising_edge(global_clk_160MHz) THEN     
 
-      IF Comparison_count = OVERFLOW_SIZE THEN
+      IF (counter_8bit_value = train_size - 1) THEN
         process_complete <= '1';
-        Comparison_count := 0;
+        counter_8bit_reset <= '1';
         Control_DataOut <= BubbleSort_Control;
         Control_BubbleSort <= Router_Control;
       ELSE
         process_complete <= '0';
-        Comparison_count := Comparison_count + 1;
+        counter_8bit_reset <= '0';
         Control_BubbleSort <= BubbleSort_Control;
       END IF;
 

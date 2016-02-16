@@ -12,6 +12,11 @@ add wave -position end  sim:/bubble_sort_test_top/process_complete
 add wave -position end  sim:/bubble_sort_test_top/test_clk
 add wave -position end  sim:/bubble_sort_test_top/test_rst
 
+add wave -noupdate -divider Counter
+
+add wave -position end  sim:/bubble_sort_test_top/bubbleinst1/counter_reset_global
+add wave -position end  sim:/bubble_sort_test_top/bubbleinst1/counter_value
+
 add wave -noupdate -divider Sorting\ Signals
 
 add wave -position end sim:/bubble_sort_test_top/bubbleinst1/Router_Control
