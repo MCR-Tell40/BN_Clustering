@@ -8,10 +8,10 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
-USE work.bubble_sort_package.all;
+USE work.Isolation_Flagging_Package.all;
 USE work.Detector_Constant_Declaration.all;
 
-ENTITY BubbleSort IS
+ENTITY Isolation_Flagging_Sort_Unit IS
 	
 
   PORT(
@@ -27,7 +27,7 @@ ENTITY BubbleSort IS
 
  END ENTITY;
 
-ARCHITECTURE a OF BubbleSort IS
+ARCHITECTURE a OF Isolation_Flagging_Sort_Unit IS
 	SHARED VARIABLE inter_reg : dataTrain; --intermediate shift regester
 
 BEGIN

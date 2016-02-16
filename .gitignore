@@ -28,9 +28,11 @@
 # dir's
 steffi_stuff_all/auto-comp-files/
 VHDL/modelsim/bubble_sort_moduals/work/
+VHDL/modelsim/work
 VHDL/quartus/incremental_db/
 VHDL/quartus/output_files/
 VHDL/quartus/db/
+
 
 #executables
 timesync_validation/timesyncAnalysis

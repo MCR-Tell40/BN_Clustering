@@ -6,11 +6,11 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
-use work.bubble_sort_package.all;
+use work.Isolation_Flagging_Package.all;
 USE work.Detector_Constant_Declaration.all;
 
 
-ENTITY bubbleSortController IS
+ENTITY Isolation_Flagging_Sort_Controller IS
   port(
     
     global_rst			    : IN    std_logic;
@@ -19,13 +19,13 @@ ENTITY bubbleSortController IS
     sorted_data_out     : OUT 	dataTrain;
     process_complete    : INOUT   std_logic
   );
-END bubbleSortController;
+END Isolation_Flagging_Sort_Controller;
 
-ARCHITECTURE a OF bubbleSortController IS
+ARCHITECTURE a OF Isolation_Flagging_Sort_Controller IS
     
 	-- ##### Components ##### --
 
-  COMPONENT BubbleSort IS
+  COMPONENT Isolation_Flagging_Sort_Unit IS
  		PORT(
   		rst 			 : in 	std_logic;	
   		dataIn     : in 	dataTrain;
@@ -52,7 +52,7 @@ ARCHITECTURE a OF bubbleSortController IS
 
 BEGIN
   
-  BubbleSortInst1 : BubbleSort
+  BubbleSortInst1 : Isolation_Flagging_Sort_Unit
     PORT MAP (
       rst             => Control_RST,
       dataIn          => Control_BubbleSort,

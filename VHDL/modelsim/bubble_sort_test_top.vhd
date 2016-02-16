@@ -29,7 +29,7 @@ ARCHITECTURE a OF bubble_sort_test_top IS
 	    );
 	end COMPONENT ;
 
-	COMPONENT bubbleSortController IS
+	COMPONENT Isolation_Flagging_Sort_Controller IS
 	  port(    
 	    global_rst			: IN    std_logic;
 	 	global_clk_160MHz	: IN    std_logic;
@@ -62,7 +62,7 @@ ARCHITECTURE a OF bubble_sort_test_top IS
 	    	out_train       => reader_bubble_train_out
 	    );
 
-	    bubbleinst1: bubbleSortController
+	    bubbleinst1: Isolation_Flagging_Sort_Controller
 	    port map (
 	       	global_rst			  => test_rst,  
 		 	global_clk_160MHz	  => test_clk,
