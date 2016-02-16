@@ -31,8 +31,6 @@ ARCHITECTURE a OF Isolation_Flagging_Sort_Unit IS
 	SHARED VARIABLE inter_reg : dataTrain; --intermediate shift regester
 
 BEGIN
-	
-	--dataOut <= inter_reg;
 
 	PROCESS(clk, rst)
 	BEGIN
@@ -46,21 +44,17 @@ BEGIN
 			FOR i IN 0 to (OVERFLOW_SIZE - 1) LOOP
 				-- check even
 				IF ((i mod 2 = 1) AND parity = '1') OR ((i mod 2 = 0) AND parity = '0') THEN
-					report "comparison being made " & integer'image(i);
+
 					-- check if switch is required
 					IF (to_integer(unsigned(dataIn(i)(13 downto 8))) > to_integer(unsigned(dataIn(i+1)(13 downto 8)))) THEN
 						-- make switch
-						report "swapping " & integer'image(i);
 						inter_reg(i) 	:= dataIn(i+1);
 						inter_reg(i+1) 	:= dataIn(i);
 					ELSE
 						-- dont make switch
-						report "keeping " & integer'image(i);
 						inter_reg(i) 	:= dataIn(i);
 						inter_reg(i+1) 	:= dataIn(i+1); 
 					END IF;
-				ELSE
-					report "skipping comparison " & integer'image(i);
 				END IF;
 			END LOOP;
 

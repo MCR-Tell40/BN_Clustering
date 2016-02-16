@@ -73,8 +73,6 @@ BEGIN
   Control_RST       <= RST_Control;
 
   PROCESS(global_clk_160MHz, global_rst)
-    VARIABLE BubbleSortEven_SwitchMade  : std_logic;
-    VARIABLE BubbleSortOdd_SwitchMade   : std_logic;
     VARIABLE Comparison_count : integer;
   BEGIN
 
