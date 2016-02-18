@@ -10,7 +10,7 @@ use STD.textio.all;
 USE work.bubble_sort_package.all;
 USE work.Detector_Constant_Declaration.all;
 
-entity reader is
+entity file_reader is
   
   port(
     clk  : in  std_logic;
@@ -18,10 +18,10 @@ entity reader is
     --valid_out : out std_logic;
     out_train : out  datatrain
     );
-end reader ;
+end file_reader ;
 
 
-architecture r of reader is
+architecture r of file_reader is
 
   function str_to_stdvec(inp: string) return std_logic_vector is
     variable temp: std_logic_vector(inp'range) := (others => 'X');

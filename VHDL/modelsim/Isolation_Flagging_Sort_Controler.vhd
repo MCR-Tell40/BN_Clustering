@@ -70,7 +70,7 @@ ARCHITECTURE a OF Isolation_Flagging_Sort_Controller IS
 
 BEGIN
   
-  BubbleSortInst1 : Isolation_Flagging_Sort_Unit
+  Sort_Unit : Isolation_Flagging_Sort_Unit
     PORT MAP (
       rst             => Control_RST,
       dataIn          => Control_BubbleSort,
@@ -79,7 +79,7 @@ BEGIN
       dataOut         => BubbleSort_Control
     );
 
-  counter_8bit_Inst1 : counter_8bit
+  itteration_counter : counter_8bit
     PORT MAP (
       clk   => Clock_BubbleSort,
       rst   => counter_8bit_reset_global,

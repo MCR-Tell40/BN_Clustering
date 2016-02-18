@@ -8,7 +8,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
-use work.bubble_sort_package.all;
+use work.Isolation_Flagging_package.all;
 
 ENTITY bubble_sort_test_top IS
 PORT (
@@ -19,7 +19,7 @@ END bubble_sort_test_top;
 
 ARCHITECTURE a OF bubble_sort_test_top IS
 
-	COMPONENT reader is
+	COMPONENT file_reader is
 	  
 	  port(
 	    clk  		: in  std_logic;
@@ -56,7 +56,7 @@ ARCHITECTURE a OF bubble_sort_test_top IS
 
 	BEGIN
 
-	   readerinst1: reader
+	   readerinst1: file_reader
 	   	PORT MAP (
 	    	rst             => test_rst,
 	    	clk             => test_clk,
