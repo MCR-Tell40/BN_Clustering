@@ -71,15 +71,25 @@ void ASIC::next_cycle()
 	train_length.push_back(clean_array);
 }
 
+void ASIC::write_to_file(std::ofstream& out_file)
+{
+	for (int _cycle(0); _cycle < cycle; _cycle++)
+		for (int i(0); i < 511; i++)
+			out_file << train_length[_cycle][i] << std::endl;
+}
+
 Sensor::Sensor(std::array<ASIC,3> a): ASIC()
 {
 	//get max cycle
+	int maxcycle;
 	if (a[0].get_cycle() > a[1].get_cycle() && a[0].get_cycle() > a[2].get_cycle())
-		cycle = a[0].get_cycle();
+		maxcycle = a[0].get_cycle();
 	else if (a[1].get_cycle() > a[2].get_cycle())
-		cycle = a[1].get_cycle();
+		maxcycle = a[1].get_cycle();
 	else
-		cycle = a[2].get_cycle();
+		maxcycle = a[2].get_cycle();
+
+	while(cycle < maxcycle) next_cycle();
 
 	//combine all trainlength info
 	for (int i(0); i < cycle; i++)
@@ -91,10 +101,13 @@ Sensor::Sensor(std::array<ASIC,3> a): ASIC()
 Half_Module::Half_Module(std::array<Sensor,2> s): Sensor()
 {
 	//get max cycle
+	int maxcycle;
 	if (s[0].get_cycle() > s[1].get_cycle())
-		cycle = s[0].get_cycle();
+		maxcycle = s[0].get_cycle();
 	else
-		cycle = s[1].get_cycle();
+		maxcycle = s[1].get_cycle();
+
+	while(cycle < maxcycle) next_cycle();
 
 	//combine trainlength info
 	for (int i(0); i < cycle; i++)

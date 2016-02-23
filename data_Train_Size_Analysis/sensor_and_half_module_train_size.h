@@ -46,6 +46,8 @@ public:
 			return 0;
 	}
 
+	void write_to_file(std::ofstream&);
+
 };
 
 class Sensor : public ASIC
@@ -82,9 +84,12 @@ int main(int argc, char** argv)
 	//	asic creation 
 	for (int i(0); i < 624; i++)
 	{
-		std::cout << "\r\033[K" // line
+		//progress
+		std::cout << "\r\033[K" 
 			<< "ASIC " << i+1 << " / 624";
 			
+
+		// read in
 		std::stringstream filename;
 
 		filename << argv[1] << "/timesync" << i << ".txt";
@@ -93,6 +98,8 @@ int main(int argc, char** argv)
 
 		ASIC_array[i] = ASIC(in_file);
 
+		in_file.close();
+
 		if (i==0) 
 			ASIC_min_cycle = ASIC_array[0].get_cycle();
 		else if (ASIC_min_cycle < ASIC_array[i].get_cycle())
@@ -100,6 +107,15 @@ int main(int argc, char** argv)
 
 		std::cout << " #cycle = " << ASIC_min_cycle;
 		std::cout.flush();
+
+		// write out
+		std::stringstream out_filename;
+		out_filename << argv[2] << "/ASIC/ASIC_train_lengths_" << i << ".txt";
+		std::ofstream out_file(out_filename.str());
+
+		ASIC_array[i].write_to_file(out_file);
+
+		out_file.flush();
 
 	}
 
@@ -118,6 +134,16 @@ int main(int argc, char** argv)
 		};
 
 		Sensor_array[i] = Sensor(in_array);
+
+		// write out
+		std::stringstream out_filename;
+		out_filename << argv[2] << "/Sensor/Sensor_train_lengths_" << i << ".txt";
+		std::ofstream out_file(out_filename.str());
+
+		Sensor_array[i].write_to_file(out_file);
+
+		out_file.close();
+
 	}
 	std:: cout << '\n';
 
@@ -128,11 +154,26 @@ int main(int argc, char** argv)
 		std::cout.flush();
 	
 		std::array<Sensor,2>
-			half_1({Sensor_array[i*4],Sensor_array[i*4+2]}),
-			half_2({Sensor_array[i*4+1],Sensor_array[i*4+3]});
+			half_1({Sensor_array[i*4],Sensor_array[i*4+3]}),
+			half_2({Sensor_array[i*4+1],Sensor_array[i*4+2]});
 
 		Half_Module_array[i*2] = Half_Module(half_1);
 		Half_Module_array[i*2+1] = Half_Module(half_2);
+
+		// write out
+		std::stringstream out_filename1, out_filename2;
+		out_filename1 << argv[2] << "/Half_Module/Half_Module_train_lengths_" << i << "_1.txt";
+		out_filename2 << argv[2] << "/Half_Module/Half_Module_train_lengths_" << i << "_2.txt";
+		
+		std::ofstream out_file1(out_filename1.str());
+		std::ofstream out_file2(out_filename2.str());
+
+
+		Half_Module_array[i*2].write_to_file(out_file1);
+		Half_Module_array[i*2+1].write_to_file(out_file2);
+
+		out_file1.close();
+		out_file2.close();
 	}
 	std:: cout << '\n';
 
