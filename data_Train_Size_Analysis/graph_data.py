@@ -2,35 +2,6 @@ import ROOT as rt
 import sys
 from subprocess import call
 
-# def ASIC_graph():
-
-# 	# graph creation
-# 	cut_off_16 = rt.TH1F("cut_off_16","Cut Off 16;ASIC;Effeciency",624,0,624)
-# 	cut_off_32 = rt.TH1F("cut_off_32","Cut Off 32;ASIC;Effeciency",624,0,624)
-# 	cut_off_64 = rt.TH1F("cut_off_64","Cut Off 64;ASIC;Effeciency",624,0,624)
-# 	empty_bcid = rt.TH1F("empty_bcid","Empty BCID;ASIC;Effeciency",624,0,624)
-
-# 	for x in range(0,624):
-		
-# 		with open('output/ASIC/ASIC_train_lengths_'+str(x)+'.txt') as in_file:
-# 			data = in_file.read().split('\n')
-
-# 		for bcid_size in data:
-# 			if (int(bcid_size) < 64):
-# 				cut_off_64.Fill(x)
-# 			if (int(bcid_size) < 32):
-# 				cut_off_32.Fill(x)
-# 			if (int(bcid_size) < 16):
-# 				cut_off_16.Fill(x)
-# 			if (bcid_size == 0);
-# 				empty_bcid.Fill(x)
-
-
-
-
-
-
-
 # def Sensor_graph():
 
 def Half_Module_graph():
