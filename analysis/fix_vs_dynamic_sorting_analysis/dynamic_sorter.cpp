@@ -1,15 +1,15 @@
 #include "dynamic_sorter.h"
 
-dyn::bubble_sort_time(std::vector<velo::spp> data_train)
+int dyn::bubble_sort_time(std::vector<std::shared_ptr<velo::spp>> data_train)
 {
 }
 
-std::vector<velo::spp> dyn::bubble_sort_even(std::vector<velo::spp> data_train)
+std::vector<std::shared_ptr<velo::spp>> dyn::bubble_sort_even(std::vector<std::shared_ptr<velo::spp>> data_train)
 {
-	std::vector<velo::spp> out_vector = data_train;
+	std::vector<std::shared_ptr<velo::spp>> out_vector = data_train;
 
 	for(uint i(0); i < data_train.size()-1; i += 2)
-		if (data_train[i].get_rowID() > data_train[i+1].get_rowID())
+		if (data_train[i]->get_rowID() > data_train[i+1]->get_rowID())
 		{
 			out_vector[i] = data_train[i+1];
 			out_vector[i+1] = data_train[i];
@@ -19,12 +19,12 @@ std::vector<velo::spp> dyn::bubble_sort_even(std::vector<velo::spp> data_train)
 
 }
 
-std::vector<velo::spp> dyn::bubble_sort_odd(std::vector<velo::spp> data_train)
+std::vector<std::shared_ptr<velo::spp>> dyn::bubble_sort_odd(std::vector<std::shared_ptr<velo::spp>> data_train)
 {
-	std::vector<velo::spp> out_vector = data_train;
+	std::vector<std::shared_ptr<velo::spp>> out_vector = data_train;
 
 	for(uint i(1); i < data_train.size()-1; i += 2)
-		if (data_train[i].get_rowID() > data_train[i+1].get_rowID())
+		if (data_train[i]->get_rowID() > data_train[i+1]->get_rowID())
 		{
 			out_vector[i] = data_train[i+1];
 			out_vector[i+1] = data_train[i];

@@ -2,8 +2,8 @@ TARGET = fix_dyn_analysis
 ROOTFLAGS = $(shell root-config --cflags)
 ROOTLIBS  = $(shell root-config --libs)
 
-all: velo.o dynamic_sorter.o
-	g++ -o $(TARGET) fix_dyn_analysis.o velo.o dynamic_sorter.o
+all: velo.o dynamic_sorter.o fix_dyn_analysis.o
+	g++ -o $(TARGET) $(ROOTFLAGS) $(ROOTLIBS) fix_dyn_analysis.o velo.o dynamic_sorter.o
 
 fix_dyn_analysis.o: fix_dyn_analysis.cpp
 	g++ -c $(ROOTFLAGS) $(ROOTLIBS) fix_dyn_analysis.cpp

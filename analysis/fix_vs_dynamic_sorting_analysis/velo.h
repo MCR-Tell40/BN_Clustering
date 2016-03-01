@@ -18,13 +18,13 @@ namespace velo
 			switch(errorID)
 			{
 				case 1:
-					return "SPP input of wrong size"
+					return "SPP input of wrong size";
 				case 2:
-					return "BCID not defined"
+					return "BCID not defined";
 				case 3:
-					return "chipID not defined"
+					return "chipID not defined";
 				default:
-					return "Unknown VELO error"
+					return "Unknown VELO error";
 			}
 		} 
 	};
@@ -46,7 +46,7 @@ namespace velo
 	public:
 		spp();
 		spp(std::string);
-		spp(spp&); //copy constructor
+		// spp(const velo::spp&); //copy constructor
 
 		/* ---- Copy ---- */
 		spp & operator=(spp);
@@ -58,8 +58,8 @@ namespace velo
 		uint8_t 	get_chipID	();
 
 		//inline
-		inline bool BCID_given(){return BCID_given;}
-		inline bool chipID_given(){return chipID_given;}
+		inline bool get_BCID_given(){return BCID_given;}
+		inline bool get_chipID_given(){return chipID_given;}
 		inline uint16_t get_columnID(){return columnID;}
 		inline uint16_t get_rowID	(){return rowID;}
 		inline uint8_t 	get_hitmap	(){return hitmap;}
