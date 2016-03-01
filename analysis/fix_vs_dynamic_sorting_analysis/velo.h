@@ -6,12 +6,12 @@
 
 namespace velo
 {
-	class velo_exept
+	class velo_except
 	{
 	private:
 		int errorID;
 	public:
-		velo_exept(int e): errorID(e){}
+		velo_except(int e): errorID(e){}
 		inline int get_error(){return errorID;}
 		std::string what()
 		{

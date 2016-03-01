@@ -31,7 +31,7 @@ velo::spp::spp(std::string input)
 		hitmap		= std::bitset<8>(input.substr(21,8)).to_ulong();
 		BCID_given = true; chipID_given =false;
 	}
-	else throw velo_exept(1);
+	else throw velo_except(1);
 }
 
 // velo::spp::spp(const velo::spp& copy)
@@ -97,11 +97,11 @@ velo::spp::spp(std::string input)
 uint16_t velo::spp::get_BCID()
 {
 	if(BCID_given) return BCID;
-	else throw velo_exept(2);
+	else throw velo_except(2);
 }
 
 uint8_t velo::spp::get_chipID()
 {
 	if(chipID_given) return chipID;
-	else throw velo_exept(3);
+	else throw velo_except(3);
 }

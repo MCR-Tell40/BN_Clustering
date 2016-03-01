@@ -8,10 +8,61 @@
 #include <mutex>
 #include <memory>
 #include <vector>
-#include <TH1F.h>
-#include <TFile.h>
+
+
+std::mutex mu;
+
+template <class T>
+void thread_print(T text){
+	mu.lock();
+	std::cout << text << "\n";
+	mu.unlock();
+}
+
+void output(int stat, int dyn)
+{
+	static std::ofstream ofile("histo_data.csv");
+
+	mu.lock();
+	ofile << stat << ',' << dyn << '\n';
+	mu.unlock();
+}
+
+class thread_report
+{
+private:
+	int n_cores;
+	std::vector<std::string> reports;
+	std::mutex _mu;
+
+public:
+	thread_report(int n):n_cores(n)
+	{
+		for (int i(0); i < n_cores; i++)
+			reports.push_back("");
+	}
+	void report(std::string rep, int ID)
+	{
+		_mu.lock();
+
+		if(ID >= n_cores) return;
+		reports[ID] = rep;
+
+		for (int i(0); i < n_cores; i++) thread_print("\e[A\r\e[K\e[A");
+
+		for (int i(0); i < n_cores; i++) 
+		{
+			std::stringstream text;
+			text << i << " : " << reports[i];
+			thread_print(text.str());
+		}
+
+		_mu.unlock();
+	}
+};
 
 void help();
+
 
 template <class T>
 class stack
@@ -20,18 +71,24 @@ private:
 	T * _stack;
 	size_t _size;
 	int _location;
-	std:: mutex _mu;
+	std::mutex _mu;
+
 public:
 	stack(T* stack, size_t size): _stack(stack), _size(size), _location(0){}
 
 	T get()
 	{
 		std::lock_guard<std::mutex> lock(_mu);
-		if (_location == _size) throw;
+		if (_location >= _size) throw 0;
 		else return _stack[_location++];
 	}
 };
 
+
+void process(
+	std::shared_ptr<stack<std::string> > file_queue,
+	thread_report& console,	
+	int threadID);
 
 int main(int argc, char** argv)
 {	
@@ -47,57 +104,102 @@ int main(int argc, char** argv)
 		else if (arg == "-c" && argc > i + 1) cores  = atoi(argv[++i]);
 		else if (arg == "-s" && argc > i + 1) start  = atoi(argv[++i]);
 		else if (arg == "-f" && argc > i + 1) finish = atoi(argv[++i]);
-		else if (arg == "-i" && argc > i + 1) input_dir = argv[++i];
+		else if (arg == "-d" && argc > i + 1) input_dir = argv[++i];
 		else {help(); return -1;}
 	}	
 
-	std::vector<std::string> sort_file_v;
-	std::vector<std::string> count_file_v;
+	std::vector< std::string > file_v;
+	for (int mod(start); mod<= finish; mod++)
 	for (int side(0); side <= 1; side++)
-		for (int mod(start); mod<= finish; mod++)
-		{
-			std::stringstream sort_filename, count_filename;
-			sort_filename, count_filename << input_dir;
-			if (input_dir.back() != '/') sort_filename << '/';
-			sort_filename << "Module_" << mod << '_' << side << "_.txt";
+	{
+		std::stringstream filename;
+		filename << input_dir;
+		if (input_dir.back() != '/') filename << '/';
+		filename << "Module_" << mod << '_' << side;
 
-			sort_file_v.push_back(sort_filename.str());
+		file_v.push_back(filename.str());
 
-		}
+	}
 
-	std::shared_ptr<stack<std::string>> file_queue(new stack<std::string>(&sort_file_v[0],sort_file_v.size()));
-	std::shared_ptr<TH1F> dynamic_sort_h(new TH1F("dynamic_sort_h",";Sort Time;Count",50,0,50));
-	std::shared_ptr<TH1F> static_sort_h(new TH1F("static_sort_h",";Sort Time;Count",50,0,50));
+	std::shared_ptr< stack<std::string> > file_queue(new stack< std::string >(&file_v[0],file_v.size()));
 
+	std::vector< std::shared_ptr <std::thread> > thread_v;
+
+	thread_report console(cores);
+
+	for (int t(0); t < cores; t++)
+		thread_print("");
+
+	for (int t(0); t < cores; t++)
+		thread_v.push_back(std::shared_ptr<std::thread>(new std::thread(process,file_queue,std::ref(console),t)));
+
+	for (int t(0); t < cores; t++)
+		thread_v[t]->join();
 }
 
 void process(
-	std::shared_ptr<stack<std::string>> sort_file_queue,
-	std::shared_ptr<stack<std::string>> count_file_queue, 
-	std::shared_ptr<TH1F> dynamic_sort_h, 
-	std::shared_ptr<TH1F> static_sort_h, 
-	int threadID
-	)
+	std::shared_ptr<stack<std::string> > file_queue,
+	thread_report& console,
+	int threadID)
 {
 	while(1)
-	{	
-		std::ifstream ifile_count, ifile_sort;		
-		//get new file if available, else exit thread
+	{
+
+		std::string filename;
+
 		try
 		{
-			ifile_count.open(count_file_queue->get());
-			ifile_sort.open(sort_file_queue->get());
+			filename = file_queue->get();
 		}
-		catch(...)
+		catch(int i)
 		{
 			return;
 		}
 
-		std::string line_in("");
-		std::string line_prev("");
-		std::vector<std::string> spp_v;
-		
-	}
+		//count and sort files
+		std::ifstream icount(filename + "_count.txt");
+		std::ifstream isort(filename + "_sort.txt");
+		console.report(filename,threadID);
+
+		std::string temp;
+
+		while(icount >> temp)
+		{
+			int spp_count = std::bitset<8>(temp).to_ulong();
+
+			if (spp_count > 48 || spp_count <= 0) continue;
+			else
+			{
+				int ram_access = spp_count / 16;
+				if (spp_count % 16 != 0) ram_access++;
+
+				std::vector< std::shared_ptr <velo::spp> > datatrain;
+
+				for (int i(0); i < ram_access; i++)
+				{
+					std::string ram_output;
+					isort >> ram_output;
+
+					if (ram_output.length() == 0) continue;
+
+					try{
+						for (int j(0); j<16; j++)
+							datatrain.push_back(std::shared_ptr<velo::spp>(new velo::spp(ram_output.substr(j*16,24))));					
+					}catch(velo::velo_except e)
+					{
+						thread_print(e.what());
+					}
+				}
+
+				int dyn_time = dyn::bubble_sort_time(std::move(datatrain));
+
+				output(spp_count,dyn_time);
+				std::stringstream report;
+				report << filename << " : static" << spp_count << "\t: dynamic" << dyn_time << "\t: train " << datatrain.size();
+				console.report(report.str(),threadID);
+			}
+		}
+	}	
 }
 
 void help()
@@ -106,9 +208,8 @@ void help()
 		<< "\nDynamic vs Fixes Sort Analysis\n\n"
 		<< "Options:\n"
 		<< "-h\t Help\n"
-		<< "-c\t No. cores = 1"
-		<< "-i\t Input Directory = .\n"
+		<< "-c\t No. cores = 1\n"
+		<< "-d\t Input Directory = .\n"
 		<< "-s\t Start Sensor = 0\n"
 		<< "-f\t Finish Sensor = 51\n\n";
-
 }

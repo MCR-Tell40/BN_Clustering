@@ -1,7 +1,8 @@
 import sys
 from copy import deepcopy
 
-__line_size__ = 384
+__packet_size__ = 24
+__line_size__ = __packet_size__*16
 
 def __main__():
 
