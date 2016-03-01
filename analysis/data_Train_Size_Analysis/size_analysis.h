@@ -83,8 +83,9 @@ int main(int argc, char ** argv)
 		std::cout << "opening file: "<< filename.str() << std::endl;
 	#endif
 
-		if (i % 1 == 0)
-			std::cout << "file: " << i << "..." <<std::endl;
+		if (i != 0) std::cout << "\e[A\r\e[K";
+		
+		std::cout << "file: " << i << "..." <<std::endl;
 
 		std::fstream * in_file = new std::fstream(filename.str().c_str());
 
@@ -93,7 +94,7 @@ int main(int argc, char ** argv)
 		TH1F * histo = new TH1F(
 			histoName.str().c_str(),
 			histoName.str().c_str(),
-			250,0,250
+			64,0,64
 			);
 
 		while(*in_file >> buffer)
