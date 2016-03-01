@@ -8,6 +8,7 @@ def Half_Module_graph():
 	# graph creation
 	cut_off_16 = rt.TH1F("cut_off_16",";Module Number;Sort Acceptance Effeciency",104,0,52)
 	cut_off_32 = rt.TH1F("cut_off_32",";Module;Effeciency",104,0,52)
+	cut_off_48 = rt.TH1F("cut_off_48",";Module;Effeciency",104,0,52)
 	cut_off_64 = rt.TH1F("cut_off_64",";Module;Effeciency",104,0,52)
 	empty_bcid = rt.TH1F("empty_bcid",";Module;Effeciency",104,0,52)
 	total = rt.TH1F("total_trains","total trains;Module;number",104,0,52)
@@ -26,6 +27,8 @@ def Half_Module_graph():
 					total.Fill(x)
 					if (int(bcid_size) < 64):
 						cut_off_64.Fill(x)
+					if (int(bcid_size) < 48):
+						cut_off_48.Fill(x)
 					if (int(bcid_size) < 32):
 						cut_off_32.Fill(x)
 					if (int(bcid_size) < 16):
@@ -41,6 +44,8 @@ def Half_Module_graph():
 					total.Fill(x+0.5)
 					if (int(bcid_size) < 64):
 						cut_off_64.Fill(x+0.5)
+					if (int(bcid_size) < 48):
+						cut_off_48.Fill(x+0.5)
 					if (int(bcid_size) < 32):
 						cut_off_32.Fill(x+0.5)
 					if (int(bcid_size) < 16):
@@ -50,6 +55,7 @@ def Half_Module_graph():
 
 	rt.TH1.Divide(cut_off_16,total)
 	rt.TH1.Divide(cut_off_32,total)
+	rt.TH1.Divide(cut_off_48,total)
 	rt.TH1.Divide(cut_off_64,total)
 	rt.TH1.Divide(empty_bcid,total)
 
@@ -62,6 +68,8 @@ def Half_Module_graph():
 	cut_off_16.GetYaxis().SetRangeUser(0,1)
 	cut_off_32.SetLineColor(2)
 	cut_off_32.Draw('same')
+	cut_off_48.SetLineColor(6)
+	cut_off_48.Draw('same')
 	cut_off_64.SetLineColor(4)
 	cut_off_64.Draw('same')
 
@@ -73,6 +81,7 @@ def Half_Module_graph():
 	leg = rt.TLegend(0.7,0.475,0.9,0.675,'Sort Threshold Value')
 	leg.SetLineColor(1)
 	leg.AddEntry(cut_off_64,' 64','l')
+	leg.AddEntry(cut_off_48,' 48','l')
 	leg.AddEntry(cut_off_32,' 32','l')
 	leg.AddEntry(cut_off_16,' 16','l')
 	leg.AddEntry(empty_bcid,' Empty','l')
