@@ -184,18 +184,27 @@ void process(
 
 					try{
 						for (int j(0); j<16; j++)
-							datatrain.push_back(std::shared_ptr<velo::spp>(new velo::spp(ram_output.substr(j*16,24))));					
+						{
+							std::string spp_string = ram_output.substr(j*16,24);
+							// thread_print(spp_string);				
+							if (atoi(spp_string.c_str()) != 0)
+								datatrain.push_back(std::shared_ptr<velo::spp>(new velo::spp(spp_string)));
+						}
 					}catch(velo::velo_except e)
 					{
 						thread_print(e.what());
 					}
 				}
 
-				int dyn_time = dyn::bubble_sort_time(std::move(datatrain));
+				int dyn_time;
 
-				output(spp_count,dyn_time);
+				if (datatrain.size() != 0)
+					dyn_time = dyn::bubble_sort_time(std::move(datatrain));
+				else continue;
+
+				output(datatrain.size(),dyn_time);
 				std::stringstream report;
-				report << filename << " : static" << spp_count << "\t: dynamic" << dyn_time << "\t: train " << datatrain.size();
+				report << filename << " : static" << datatrain.size() << "\t: dynamic" << dyn_time << "\t: train " << datatrain.size();
 				console.report(report.str(),threadID);
 			}
 		}

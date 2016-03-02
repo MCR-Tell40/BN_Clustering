@@ -3,7 +3,7 @@ ROOTFLAGS = $(shell root-config --cflags)
 ROOTLIBS  = $(shell root-config --libs)
 
 all: velo.o dynamic_sorter.o fix_dyn_analysis.o
-	g++ -o $(TARGET) -std=c++11 fix_dyn_analysis.o velo.o dynamic_sorter.o
+	g++ -o $(TARGET) -std=c++11 fix_dyn_analysis.o velo.o dynamic_sorter.o -pthread
 
 fix_dyn_analysis.o: fix_dyn_analysis.cpp
 	g++ -c -std=c++11 fix_dyn_analysis.cpp
