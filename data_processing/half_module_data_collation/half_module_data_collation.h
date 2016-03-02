@@ -19,14 +19,14 @@ struct FIFO
 {
 	std::mutex _mu;
 	std::vector<T> array;
-	bool is_empty(){return 0 == array.size();} //not thread safe
-	T peak(){return array[0];} //not thread safe
+	int index;
+	FIFO():index(0){}
+	bool is_empty(){return 0 == array.size() || index == array.size();} //not thread safe
+	T peak(){return array[index];} //not thread safe
 	T pop(){
 		std::lock_guard<std::mutex> lock(_mu);
 		if (is_empty()) throw std::string("FIFO empty");
-		T temp = array[0];
-		array.erase(array.begin());
-		return temp;
+		return array[index++];
 	}
 	void store(T item){
 		std::lock_guard<std::mutex> lock(_mu);

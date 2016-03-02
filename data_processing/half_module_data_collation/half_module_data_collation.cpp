@@ -69,13 +69,13 @@ void threadProcess(
 		outFileName2 << 2 << ".txt";
 
 		std::ofstream oFile1(outFileName1.str());
-		thread_report(outFileName1.str(),threadID);
 		std::ofstream oFile2(outFileName2.str());
-		thread_report(outFileName2.str(),threadID);
 
+		thread_report(outFileName1.str(),threadID);
 		while(!side1.is_empty())
 			oFile1 << side1.pop() << '\n';
 
+		thread_report(outFileName2.str(),threadID);
 		while(!side2.is_empty())
 			oFile2 << side2.pop() << '\n';
 	}
