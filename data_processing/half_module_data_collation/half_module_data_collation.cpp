@@ -13,7 +13,9 @@ void threadProcess(
 		int module_number;
 		try {
 			module_number = module_list.pop();
-			thread_report("Getting next module",threadID);
+			std:: stringstream report;
+			report << "Stating module " << module_number;
+			thread_report(report.str(),threadID);
 		}catch(std::string i) {
 			thread_report("Terminating",threadID);
 			return;
@@ -28,8 +30,6 @@ void threadProcess(
 			filename << iFileDir << "timesync" << module_number*12 + i << ".txt";
 			std::ifstream iFile(filename.str());
 			std::string tempIn;
-
-			thread_report(filename.str(),threadID);
 
 			while(iFile >> tempIn)
 			{
@@ -57,7 +57,7 @@ void threadProcess(
 			complete = true;
 			for (auto& asic : asicData) if (!asic.is_empty()) complete = false;
 			if (next_bcid) bcid ++;
-			if (bcid >= 512) {bcid = 0; thread_report("bcid rollover",threadID);}
+			if (bcid >= 512) bcid = 0;
 			next_bcid = true;
 		}
 
@@ -71,11 +71,10 @@ void threadProcess(
 		std::ofstream oFile1(outFileName1.str());
 		std::ofstream oFile2(outFileName2.str());
 
-		thread_report(outFileName1.str(),threadID);
+		thread_report("Writing to file",threadID);
 		while(!side1.is_empty())
 			oFile1 << side1.pop() << '\n';
 
-		thread_report(outFileName2.str(),threadID);
 		while(!side2.is_empty())
 			oFile2 << side2.pop() << '\n';
 	}
