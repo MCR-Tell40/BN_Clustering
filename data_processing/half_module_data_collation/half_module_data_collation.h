@@ -22,7 +22,7 @@ struct FIFO
 	int index;
 	FIFO():index(0){}
 	bool is_empty(){return 0 == array.size() || index == array.size();} //not thread safe
-	T peak(){return array[index];} //not thread safe
+	T peek(){return array[index];} //not thread safe
 	T pop(){
 		std::lock_guard<std::mutex> lock(_mu);
 		if (is_empty()) throw std::string("FIFO empty");

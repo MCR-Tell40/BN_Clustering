@@ -9,10 +9,6 @@ int dyn::bubble_sort_time(std::vector<std::shared_ptr<velo::spp>>&& data_train)
 
 	auto data = data_train;
 
-	// std::cout << "***\n";
-	// for (int i(0); i < data.size(); i++)
-	// 	std:: cout << data[i]->get_rowID() << "\n";
-
 	while(1)
 	{	
 		count++;
@@ -29,35 +25,12 @@ int dyn::bubble_sort_time(std::vector<std::shared_ptr<velo::spp>>&& data_train)
 		}
 		parity = !parity;
 
-		// std::cout << 'e' << even_comp << 'o' << odd_comp << 'p' << parity << 'c' << count << '\n';
-
 		if(even_comp == true && odd_comp == true) 
 		{
-			// std::cout << "***\n";
-			// for (int i(0); i < data.size(); i++)
-			// 	std:: cout << data[i]->get_rowID() << "\n";
-
 			return count;
 		}
 	}	
 }
-
-// bool dyn::train_compare(
-// 	std::vector<std::shared_ptr<velo::spp>> data_train1, 
-// 	std::vector<std::shared_ptr<velo::spp>> data_train2)
-// {
-// 	if (data_train1.size() != data_train2.size()) return false;
-
-// 	for (int i(0); i < data_train1.size(); i++)
-// 		if (data_train1->at(i)->get_rowID() != data_train2->at(i)->get_rowID())
-// 		{
-// 			std::cout << "trains not equal";
-// 			return false;
-// 		}
-
-// 	std::cout << "trains equal";
-// 	return true;
-// }
 
 bool dyn::bubble_sort_even(std::vector<std::shared_ptr<velo::spp> > * data_train)
 {

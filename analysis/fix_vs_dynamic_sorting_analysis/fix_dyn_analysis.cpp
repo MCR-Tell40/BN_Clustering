@@ -19,6 +19,7 @@ void thread_print(T text){
 	mu.unlock();
 }
 
+
 void output(int stat, int dyn)
 {
 	static std::ofstream ofile("histo_data.csv");
@@ -27,6 +28,7 @@ void output(int stat, int dyn)
 	ofile << stat << ',' << dyn << '\n';
 	mu.unlock();
 }
+
 
 class thread_report
 {
@@ -61,6 +63,7 @@ public:
 	}
 };
 
+
 void help();
 
 
@@ -90,6 +93,7 @@ void process(
 	thread_report& console,	
 	int threadID);
 
+
 int main(int argc, char** argv)
 {	
 	// Default values
@@ -118,7 +122,6 @@ int main(int argc, char** argv)
 		filename << "Module_" << mod << '_' << side;
 
 		file_v.push_back(filename.str());
-
 	}
 
 	std::shared_ptr< stack<std::string> > file_queue(new stack< std::string >(&file_v[0],file_v.size()));
@@ -199,7 +202,7 @@ void process(
 				int dyn_time;
 
 				if (datatrain.size() != 0)
-					dyn_time = dyn::bubble_sort_time(std::move(datatrain));
+					dyn_time = dyn::bubble_sort_time(std::ref(datatrain));
 				else continue;
 
 				output(datatrain.size(),dyn_time);

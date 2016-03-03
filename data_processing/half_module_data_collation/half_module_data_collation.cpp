@@ -27,7 +27,7 @@ void threadProcess(
 		for(int i(0); i < 12; i++)
 		{
 			std::stringstream filename;
-			filename << iFileDir << "timesync" << module_number*12 + i << ".txt";
+			filename << iFileDir << "/timesync" << module_number*12 + i << ".txt";
 			std::ifstream iFile(filename.str());
 			std::string tempIn;
 
@@ -45,7 +45,7 @@ void threadProcess(
 		{
 			for (int i(0); i < 12; i++)
 				if(!asicData[i].is_empty()){
-					if(get_bcid(asicData[i].peak()) == bcid){
+					if(get_bcid(asicData[i].peek()) == bcid){
 						if (i < 3 || i >= 9)
 							side1.store(asicData[i].pop());
 						else
@@ -56,15 +56,14 @@ void threadProcess(
 
 			complete = true;
 			for (auto& asic : asicData) if (!asic.is_empty()) complete = false;
-			if (next_bcid) bcid ++;
-			if (bcid >= 512) bcid = 0;
+			if (next_bcid) if (++bcid >= 512) bcid = 0;
 			next_bcid = true;
 		}
 
 		std::stringstream outFileName1;
 		outFileName1 << oFileDir << "/module_" << module_number << "_";
 		std::stringstream outFileName2;
-		outFileName2 << outFileName1.str();
+		outFileName2 << outFileName1.str(); //shits and giggles
 		outFileName1 << 1 << ".txt";
 		outFileName2 << 2 << ".txt";
 
