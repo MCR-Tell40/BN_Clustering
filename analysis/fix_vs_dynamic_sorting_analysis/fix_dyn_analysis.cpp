@@ -65,6 +65,7 @@ public:
 
 
 void help();
+void Analysis(std::vector<std::shared_ptr<velo::spp>>&&);
 
 
 template <class T>
@@ -101,6 +102,7 @@ int main(int argc, char** argv)
 	int start = 0, finish = 51, cores = 1;
 
 	// cmd line args
+	if(argc == 1) {help(); return -1;}
 	for (int i(1); i < argc; i++)
 	{
 		std::string arg = argv[i];
@@ -119,7 +121,7 @@ int main(int argc, char** argv)
 		std::stringstream filename;
 		filename << input_dir;
 		if (input_dir.back() != '/') filename << '/';
-		filename << "Module_" << mod << '_' << side;
+		filename << "module_" << mod << '_' << side << ".txt";
 
 		file_v.push_back(filename.str());
 	}
@@ -136,8 +138,7 @@ int main(int argc, char** argv)
 	for (int t(0); t < cores; t++)
 		thread_v.push_back(std::shared_ptr<std::thread>(new std::thread(process,file_queue,std::ref(console),t)));
 
-	for (int t(0); t < cores; t++)
-		thread_v[t]->join();
+	for (auto& tr : thread_v) tr->join();
 }
 
 void process(
@@ -153,65 +154,57 @@ void process(
 		try
 		{
 			filename = file_queue->get();
+			console.report(filename,threadID);
 		}
 		catch(int i)
 		{
 			return;
 		}
 
-		//count and sort files
-		std::ifstream icount(filename + "_count.txt");
-		std::ifstream isort(filename + "_sort.txt");
-		console.report(filename,threadID);
+		std::fstream ifile(filename,std::iostream::in);
 
-		std::string temp;
+		std::shared_ptr<velo::spp> sppIn;
+		velo::spp sppLast;
+		std::string buffer;
+		std::vector<std::shared_ptr<velo::spp>> datatrain;
+		bool first(true);
 
-		while(icount >> temp)
+		while(ifile >> buffer)
 		{
-			int spp_count = std::bitset<8>(temp).to_ulong();
+			if (buffer == "") continue;
+			else sppIn = std::shared_ptr<velo::spp>(new velo::spp(buffer));
 
-			if (spp_count > 48 || spp_count <= 0) continue;
-			else
-			{
-				int ram_access = spp_count / 16;
-				if (spp_count % 16 != 0) ram_access++;
-
-				std::vector< std::shared_ptr <velo::spp> > datatrain;
-
-				for (int i(0); i < ram_access; i++)
-				{
-					std::string ram_output;
-					isort >> ram_output;
-
-					if (ram_output.length() == 0) continue;
-
-					try{
-						for (int j(0); j<16; j++)
-						{
-							std::string spp_string = ram_output.substr(j*16,24);
-							// thread_print(spp_string);				
-							if (atoi(spp_string.c_str()) != 0)
-								datatrain.push_back(std::shared_ptr<velo::spp>(new velo::spp(spp_string)));
-						}
-					}catch(velo::velo_except e)
-					{
-						thread_print(e.what());
-					}
-				}
-
-				int dyn_time;
-
-				if (datatrain.size() != 0)
-					dyn_time = dyn::bubble_sort_time(std::ref(datatrain));
-				else continue;
-
-				output(datatrain.size(),dyn_time);
-				std::stringstream report;
-				report << filename << " : static" << datatrain.size() << "\t: dynamic" << dyn_time << "\t: train " << datatrain.size();
-				console.report(report.str(),threadID);
+			if (first){
+				sppLast = *sppIn;
+				first = false;
 			}
+
+			if (sppLast.get_BCID() != sppIn->get_BCID())
+			{
+				// std::stringstream report;
+				// report << "Analysing datatrain of size: " << datatrain.size() << '\n';
+				// console.report(report.str(),threadID);
+				if(datatrain.size() > 0){
+					Analysis(std::move(datatrain));
+					datatrain.clear();
+				}
+			}
+
+			datatrain.push_back(sppIn);
+			sppLast = (*sppIn);
+		}
+		if(datatrain.size() > 0){
+			Analysis(std::move(datatrain));
+			datatrain.clear();
 		}
 	}	
+}
+
+void Analysis(std::vector<std::shared_ptr<velo::spp>>&& datatrain)
+{
+	int stat_t = datatrain.size();
+	int dyn_t = dyn::bubble_sort_time(std::move(datatrain));
+	output(stat_t,dyn_t);
 }
 
 void help()

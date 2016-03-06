@@ -37,7 +37,7 @@ bool dyn::bubble_sort_even(std::vector<std::shared_ptr<velo::spp> > * data_train
 	bool comp(true);
 
 	for(size_t i(0); i < data_train->size()-1; i += 2)
-		if (data_train->at(i)->get_rowID() < data_train->at(i+1)->get_rowID())
+		if (data_train->at(i)->get_rowID() > data_train->at(i+1)->get_rowID())
 		{
 			std::swap(data_train->at(i),data_train->at(i+1));
 			comp = false;
@@ -51,7 +51,7 @@ bool dyn::bubble_sort_odd(std::vector<std::shared_ptr<velo::spp> > * data_train)
 	bool comp(true);
 
 	for(size_t i(1); i < data_train->size()-1; i += 2)
-		if (data_train->at(i)->get_rowID() < data_train->at(i+1)->get_rowID())
+		if (data_train->at(i)->get_rowID() > data_train->at(i+1)->get_rowID())
 		{
 			std::swap(data_train->at(i),data_train->at(i+1));
 			comp = false;

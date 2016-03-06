@@ -32,43 +32,32 @@ namespace velo
 	class spp
 	{
 	private:
-		uint16_t 
-			BCID, 
-			columnID, 
-			rowID;
-		
-		uint8_t  
-			chipID, 
-			hitmap;
-		
-		bool BCID_given, chipID_given;
+		//pimpl class implimentation
+		struct impl;
+		std::unique_ptr<impl> pimpl;
 	
 	public:
 		spp();
 		spp(std::string);
-		// spp(const velo::spp&); //copy constructor
+		spp(const velo::spp&);
+		~spp();
 
 		/* ---- Copy ---- */
-		spp & operator=(spp);
+		spp & operator=(const spp &);
 
 		/* ---- Get ---- */
 
-		//conditional
 		uint16_t 	get_BCID	();
 		uint8_t 	get_chipID	();
-
-		//inline
-		inline bool get_BCID_given(){return BCID_given;}
-		inline bool get_chipID_given(){return chipID_given;}
-		inline uint16_t get_columnID(){return columnID;}
-		inline uint16_t get_rowID	(){return rowID;}
-		inline uint8_t 	get_hitmap	(){return hitmap;}
+		bool 		get_BCID_given();
+		bool 		get_chipID_given();
+		uint16_t 	get_columnID();
+		uint16_t 	get_rowID	();
+		uint8_t 	get_hitmap	();
 
 		/* ---- Set ---- */
-		inline void set_BCID(uint16_t id)
-			{BCID = id;		BCID_given = true;}
-		inline void det_chipID(uint8_t id)
-			{chipID = id;	chipID_given = true;}
+		void set_BCID(uint16_t id);
+		void det_chipID(uint8_t id);
 	};
 
 }
