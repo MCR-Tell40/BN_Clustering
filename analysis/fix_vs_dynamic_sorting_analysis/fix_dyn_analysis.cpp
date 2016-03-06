@@ -116,7 +116,7 @@ int main(int argc, char** argv)
 
 	std::vector< std::string > file_v;
 	for (int mod(start); mod<= finish; mod++)
-	for (int side(0); side <= 1; side++)
+	for (int side(1); side <= 2; side++)
 	{
 		std::stringstream filename;
 		filename << input_dir;
@@ -181,9 +181,6 @@ void process(
 
 			if (sppLast.get_BCID() != sppIn->get_BCID())
 			{
-				// std::stringstream report;
-				// report << "Analysing datatrain of size: " << datatrain.size() << '\n';
-				// console.report(report.str(),threadID);
 				if(datatrain.size() > 0){
 					Analysis(std::move(datatrain));
 					datatrain.clear();

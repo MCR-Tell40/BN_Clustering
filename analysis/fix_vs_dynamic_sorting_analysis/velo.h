@@ -34,7 +34,7 @@ namespace velo
 	private:
 		//pimpl class implimentation
 		struct impl;
-		std::unique_ptr<impl> pimpl;
+		std::shared_ptr<impl> pimpl;
 	
 	public:
 		spp();
@@ -63,3 +63,4 @@ namespace velo
 }
 
 #endif
+
