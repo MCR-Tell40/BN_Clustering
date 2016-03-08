@@ -3,28 +3,29 @@
 
 #include <string>
 #include <bitset>
+#include <memory>
 
 namespace velo
 {
 	class velo_except
 	{
-	private:
-		int errorID;
-	public:
-		velo_except(int e): errorID(e){}
-		inline int get_error(){return errorID;}
-		std::string what()
-		{
-			switch(errorID)
+		private:
+			int errorID;
+		public:
+			velo_except(int e): errorID(e){}
+			inline int get_error(){return errorID;}
+			std::string what()
 			{
-				case 1:
-					return "SPP input of wrong size";
-				case 2:
-					return "BCID not defined";
-				case 3:
-					return "chipID not defined";
-				default:
-					return "Unknown VELO error";
+				switch(errorID)
+				{
+					case 1:
+						return "SPP input of wrong size";
+					case 2:
+						return "BCID not defined";
+					case 3:
+						return "chipID not defined";
+					default:
+						return "Unknown VELO error";
 			}
 		} 
 	};
@@ -40,10 +41,12 @@ namespace velo
 		spp();
 		spp(std::string);
 		spp(const velo::spp&);
+		spp(velo::spp&&);
 		~spp();
 
 		/* ---- Copy ---- */
 		spp & operator=(const spp &);
+		spp & operator=(spp &&);
 
 		/* ---- Get ---- */
 
@@ -56,11 +59,9 @@ namespace velo
 		uint8_t 	get_hitmap	();
 
 		/* ---- Set ---- */
-		void set_BCID(uint16_t id);
-		void det_chipID(uint8_t id);
+		void 		set_BCID(uint16_t id);
+		void 		det_chipID(uint8_t id);
 	};
-
 }
 
 #endif
-

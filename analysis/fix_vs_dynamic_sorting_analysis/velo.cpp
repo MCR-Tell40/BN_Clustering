@@ -53,11 +53,26 @@ velo::spp::spp(velo::spp const & other):
 	pimpl(new impl(*other.pimpl))
 {}
 
+velo::spp::spp(velo::spp && other):
+	pimpl(other.pimpl)
+{
+	other.pimpl.reset();	
+}
+
 velo::spp::~spp(){}
 
 velo::spp & velo::spp::operator=(const velo::spp & other)
 {
 	velo::spp temp(other);
+
+	std::swap(pimpl,temp.pimpl);
+
+	return *this;
+}
+
+velo::spp & velo::spp::operator=(velo::spp && other)
+{
+	velo::spp temp(std::move(other));
 
 	std::swap(pimpl,temp.pimpl);
 
