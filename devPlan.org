@@ -1,16 +1,23 @@
 Priority List [#A] highest, [#C] Lowest
 
-* Unassigned Feature List [0/8]
-** TODO Upgrade sorting to Semi-Static Method
-** TODO Sort by column + chipID
-** TODO Flagging Unit logic to not sort edge case between sencors
-** TODO Design + Build Desigion Unit
-** TODO Design + Build Bypass
-** TODO Design + Build RAM-interface -> data routing unit
-** TODO Sorting units upgrade to include 'loop flag'
-** TODO Design + Build sorting sink -> interfaceing with MEP RAM
+* Unassigned Feature List [0/9]
+** TODO Design + Build Bypass										 :2_days:
+** TODO Design + Build RAM-interface -> data routing unit			  :month:
+** TODO Design + Build sorting sink -> interfaceing with MEP RAM	  :month:
+
+assignment Tue 8 march
+
+* Jobs Nick [0/3]
+  DEADLINE: <2016-03-17 Thu>
+** TODO [#A] Upgrade sorting to Semi-Static Method				   :half_day:
+** TODO [#B] Design Presentation for working group				   :half_day:
+** TODO [#B] Design + Build Decision Unit							  :1_day:
+
+* Jobs Ben [0/3]
+  DEADLINE: <2016-03-16 Wed>
+** TODO [#A] Sort by column + chipID							:quarter_day:
+** TODO [#B] Flagging Unit logic to not sort edge case between sensors :half_day:
+** TODO [#B] Sorting units upgrade to include 'loop flag'		   :half_day:
 
 
-* Jobs Nick [0/0]
-
-* Jobs Ben [0/0]
+* Completed List [0/0]
