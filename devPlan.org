@@ -1,0 +1,16 @@
+Priority List [#A] highest, [#C] Lowest
+
+* Unassigned Feature List [0/8]
+** TODO Upgrade sorting to Semi-Static Method
+** TODO Sort by column + chipID
+** TODO Flagging Unit logic to not sort edge case between sencors
+** TODO Design + Build Desigion Unit
+** TODO Design + Build Bypass
+** TODO Design + Build RAM-interface -> data routing unit
+** TODO Sorting units upgrade to include 'loop flag'
+** TODO Design + Build sorting sink -> interfaceing with MEP RAM
+
+
+* Jobs Nick [0/0]
+
+* Jobs Ben [0/0]
