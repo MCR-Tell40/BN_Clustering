@@ -5,10 +5,10 @@ Priority List [#A] highest, [#C] Lowest
 ** TODO Design + Build RAM-interface -> data routing unit			  :month:
 ** TODO Design + Build sorting sink -> interfaceing with MEP RAM	  :month:
 
-* Jobs Nick [1/3]
+* Jobs Nick [2/3]
   DEADLINE: <2016-03-17 Thu>
 ** DONE [#A] Design Presentation for working group				   :half_day:
-** TODO [#B] Upgrade sorting to Semi-Static Method				   :half_day:
+** DONE [#B] Upgrade sorting to Semi-Static Method				   :half_day:
 ** TODO [#B] Design + Build Decision Unit - prelim 					  :1_day:
 
 * Jobs Ben [1/3]

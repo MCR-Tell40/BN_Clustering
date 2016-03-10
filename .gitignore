@@ -43,3 +43,4 @@ VHDL/quartus/db/
 #executables
 timesync_validation/timesyncAnalysis
 data_Train_Size_Analysis/size_analysis
+analysis/fix_vs_dynamic_sorting_analysis/fix_dyn_analysis

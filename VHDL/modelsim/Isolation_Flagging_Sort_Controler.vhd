@@ -59,7 +59,7 @@ ARCHITECTURE a OF Isolation_Flagging_Sort_Controller IS
 
 	-- ##### Clock and Reset ##### --
   SIGNAL Control_RST           : std_logic;
-  SIGNAL RST_Control           : std_logic;
+  SIGNAL RST_Control           : std_logic; 
   SIGNAL Clock_BubbleSort      : std_logic;
 
   -- ##### counter_8bit ##### --
@@ -100,8 +100,9 @@ BEGIN
 
   --counter_8bit
   counter_8bit_enable <= '1';
-
   counter_8bit_reset_global <= counter_8bit_reset OR Control_RST;
+
+
 
   PROCESS(global_clk_160MHz, global_rst)
   BEGIN
