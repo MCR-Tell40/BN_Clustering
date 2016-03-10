@@ -29,12 +29,6 @@ ENTITY Isolation_Flagging_Sort_Unit IS
 
 ARCHITECTURE a OF Isolation_Flagging_Sort_Unit IS
 	SHARED VARIABLE inter_reg : dataTrain; --intermediate shift regester
-	
-	-- temps to contain info for chip id and column info
-	-- 14 downto 6 will be chip id, 5 downto 0 will be column info
-	SHARED VARIABLE temp_1 : std_logic_vector(14 downto 0);	
-	SHARED VARIABLE temp_2 : std_logic_vector(14 downto 0);
-
 
 BEGIN
 
@@ -49,19 +43,10 @@ BEGIN
 		ELSIF rising_edge(clk) THEN
 			FOR i IN 0 to (OVERFLOW_SIZE - 1) LOOP
 				-- check even
-				
-				-- create temp_1 for dataIn(i)
-				temp_1(14 downto 6) := dataIn(i)(29 downto 21);
-				temp_1(5 downto 0)  := dataIn(i)(13 downto 8);
-
-				-- create temp_2 for dataIn(i+1)
-				temp_2(14 downto 6) := dataIn(i+1)(29 downto 21);
-				temp_2(5 downto 0)  := dataIn(i+1)(13 downto 8);				
-
 				IF ((i mod 2 = 1) AND parity = '1') OR ((i mod 2 = 0) AND parity = '0') THEN
 
 					-- check if switch is required
-					IF (to_integer(unsigned(temp_1) > to_integer(unsigned(temp_2)) THEN
+					IF (to_integer(unsigned(dataIn(i)(29 downto 21) && dataIn(i)(13 downto 8))) > to_integer(unsigned(dataIn(i+1)(29 downto 21) && dataIn(i+1)(13 downto 8))) THEN
 						-- make switch
 						inter_reg(i) 	:= dataIn(i+1);
 						inter_reg(i+1) 	:= dataIn(i);
