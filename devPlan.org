@@ -6,9 +6,9 @@ Last asignment date: Tue 8 march
 ** TODO Design + Build RAM-interface -> data routing unit			   :long:
 ** TODO Design + Build sorting sink -> interfaceing with MEP RAM	   :long:
 
-* Jobs Nick [0/3]
+* Jobs Nick [1/3]
   DEADLINE: <2016-03-17 Thu>
-** TODO [#A] Design Presentation for working group				   :half_day:
+** DONE [#A] Design Presentation for working group				   :half_day:
 ** TODO [#B] Upgrade sorting to Semi-Static Method				   :half_day:
 ** TODO [#B] Design + Build Decision Unit - prelim 					  :1_day:
 
