@@ -1,4 +1,4 @@
-from ROOT import TH1F, TH2F, TFile, TCanvas, TLegend
+from ROOT import TH1F, TH2F, TFile, TCanvas, TLegend, gPad
 import sys, getopt
 
 def __main__(ifile):
@@ -36,21 +36,46 @@ def __main__(ifile):
 	Canvas = TCanvas('Dynamic_vs_Static_Sorttime_Comparison','Dynamic vs Static Sorttime Comparison',900,600)	
 # (fold)
 
+	Canvas.Divide(2,0)
+
 	stat_max = stat_histo.GetMaximum()
 	dyn_max = dyn_histo.GetMaximum()
+
+	Canvas.cd(1)
 
 	stat_histo.Draw('')
 	stat_histo.SetLineColor(4)
 	stat_histo.SetStats(0)
 	stat_histo.GetYaxis().SetRangeUser(0,max([stat_max,dyn_max])*1.1)
+	stat_histo.GetXaxis().SetRangeUser(0,70)
 	dyn_histo.Draw('same')
 	dyn_histo.SetLineColor(2)
 
-	leg = TLegend(0.7,0.75,0.89,0.89)
+	leg = TLegend(0.4,0.7,0.89,0.89)
+	leg.SetHeader('Max Sort Acceptance = 64 SPP/BCID')
 	leg.SetLineColor(0)
-	leg.AddEntry(stat_histo,'Static Sort Time','l')
+	leg.AddEntry(stat_histo,'Semi Static Sort Time','l')
 	leg.AddEntry(dyn_histo,'Dynamic Sort Time','l')
 	leg.Draw()
+
+	Canvas.cd(2)
+
+	stat_histo.Draw('')
+	stat_histo.SetLineColor(4)
+	stat_histo.SetStats(0)
+	stat_histo.GetYaxis().SetRangeUser(0.9,max([stat_max,dyn_max])*1.1)
+	stat_histo.GetXaxis().SetRangeUser(0,70)
+	dyn_histo.Draw('same')
+	dyn_histo.SetLineColor(2)
+
+	leg2 = TLegend(0.2,0.2,0.7,0.4)
+	leg2.SetHeader('Max Sort Acceptance = 64 SPP/BCID')
+	leg2.SetLineColor(0)
+	leg2.AddEntry(stat_histo,'Semi Static Sort Time','l')
+	leg2.AddEntry(dyn_histo,'Dynamic Sort Time','l')
+	leg2.Draw()
+
+	gPad.SetLogy()
 
 	Canvas.SaveAs('semiStat_dyn_sort_time.pdf')
 #(unfold)
@@ -62,7 +87,8 @@ def __main__(ifile):
 	asym_histo.GetXaxis().SetRangeUser(0,30)
 	asym_histo.Draw()
 
-	leg = TLegend(0.65,0.8,0.89,0.89)
+	leg = TLegend(0.55,0.75,0.89,0.89)
+	leg.SetHeader('Max Sort Acceptance = 64 SPP/BCID')
 	leg.SetLineColor(0)
 	leg.AddEntry(asym_histo,'Time Saved by Dynamic Sorting','l')
 	leg.Draw()
