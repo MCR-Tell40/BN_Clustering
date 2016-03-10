@@ -45,8 +45,8 @@ BEGIN
 				-- check even
 				IF ((i mod 2 = 1) AND parity = '1') OR ((i mod 2 = 0) AND parity = '0') THEN
 
-					-- check if switch is required
-					IF (to_integer(unsigned(dataIn(i)(29 downto 21) && dataIn(i)(13 downto 8))) > to_integer(unsigned(dataIn(i+1)(29 downto 21) && dataIn(i+1)(13 downto 8))) THEN
+					-- check if switch is required -- sorting by both Chip ID and column
+					IF (to_integer(unsigned(dataIn(i)(23 downto 14))) > to_integer(unsigned(dataIn(i+1)(23 downto 14))) THEN
 						-- make switch
 						inter_reg(i) 	:= dataIn(i+1);
 						inter_reg(i+1) 	:= dataIn(i);
