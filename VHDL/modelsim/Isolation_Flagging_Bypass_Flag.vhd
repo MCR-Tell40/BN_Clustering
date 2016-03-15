@@ -6,6 +6,10 @@
 -- Date: 10 Mar 2016																	--
 ------------------------------------------------------------------------------------------
 
+-- state 0	:	Wait for next timing rollover
+-- state 1	:	Read in for 32 addresses (= to 1 RAM from router)
+-- state 2	:	write desision to FIFO
+
 library IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
@@ -32,9 +36,10 @@ END bypass_decision;
 ARCHITECTURE Behavioral OF bypass_decision IS
 	
 	PROCESS(clk,rst)
-		VARIABLE state 		: NATURAL RANGE 0 TO 1;
+		VARIABLE state 		: NATURAL RANGE 0 TO 2; -- state info at top of file
 		VARIABLE timeing 	: NATURAL RANGE 0 TO 511;
 		VARIABLE phase		: NATURAL RANGE 0 TO 32;
+		VARIABLE datain_reg	: STD_LOGIC_VECTOR (4 downto 0);
 	BEGIN
 
 		IF (rst = '1') THEN 
@@ -46,6 +51,12 @@ ARCHITECTURE Behavioral OF bypass_decision IS
 
 		ELSIF (rising_edge(clk)) THEN
 
+			IF (timeing = 511) THEN
+				timeing = 0;
+			ELSE
+				timeing = timeing + 1;
+			END IF;
+
 			IF (state = 0 AND timeing = 0) THEN
 				state := 1;
 
@@ -54,15 +65,39 @@ ARCHITECTURE Behavioral OF bypass_decision IS
 				IF (phase = 32) THEN -- end of phase
 					phase := 0;
 					state := 0;
+					datain_read_enable <= '0';
+					dataout_write_enable <= '0';
 
 				ELSE
 					
-					datain_read_enable <= 0;
-									
+					datain_read_enable <= '1';
+					dataout_write_enable <= '0';
+					datain_reg <= datain;
+					state := 2;
 
+				END IF;
 
+			ELSIF (state = 2) THEN
 
+				datain_read_enable <= '0';
+				dataout_write_enable <= '1';
+				phase := phase + 1;
 
+				IF (datain_reg(4) = '1' ) THEN
+					dataout <= '0' & datain_reg;
+				ELSE
+					dataout <= '1' & datain_reg;
+				END IF; 
+
+				state := 1;
+
+				IF (datain_RAM_Access_Pointer = X"1FF") THEN
+					datain_RAM_Access_Pointer <= (others => '0');
+				ELSE
+					datain_RAM_Access_Pointer <= datain_RAM_Access_Pointer + 1;
+				END IF;
+
+			END IF;
 
 		END IF;
 
