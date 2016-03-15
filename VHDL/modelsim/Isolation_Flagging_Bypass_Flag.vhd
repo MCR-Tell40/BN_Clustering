@@ -19,13 +19,13 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 ENTITY bypass_decision IS
 	PORT(
 		-- output --
-		dataout 					: OUT STD_LOGIC_VECTOR(5 downto 0),
-		dataout_write_enable 		: OUT STD_LOGIC,
+		dataout 					: OUT STD_LOGIC_VECTOR(5 downto 0);
+		dataout_write_enable 		: OUT STD_LOGIC;
 		
 		-- input --
-		datain 						: IN  STD_LOGIC_VECTOR(4 downto 0),
-		datain_read_enable 			: OUT STD_LOGIC,
-		datain_RAM_Access_Pointer 	: OUT STD_LOGIC_VECTOR(8 downto 0)
+		datain 						: IN  STD_LOGIC_VECTOR(4 downto 0);
+		datain_read_enable 			: OUT STD_LOGIC;
+		datain_RAM_Access_Pointer 	: OUT STD_LOGIC_VECTOR(8 downto 0);
 
 		-- control --
 		clk, rst					: IN STD_LOGIC
@@ -34,27 +34,29 @@ ENTITY bypass_decision IS
 END bypass_decision;
 
 ARCHITECTURE Behavioral OF bypass_decision IS
-	
+	SHARED VARIABLE RAM_Access_Pointer : STD_LOGIC_VECTOR (8 downto 0);
+BEGIN
+
 	PROCESS(clk,rst)
-		VARIABLE state 		: NATURAL RANGE 0 TO 2; -- state info at top of file
-		VARIABLE timeing 	: NATURAL RANGE 0 TO 511;
-		VARIABLE phase		: NATURAL RANGE 0 TO 32;
-		VARIABLE datain_reg	: STD_LOGIC_VECTOR (4 downto 0);
+		VARIABLE state 				: NATURAL RANGE 0 TO 2; 			-- state info at top of file
+		VARIABLE timeing 			: NATURAL RANGE 0 TO 511;
+		VARIABLE phase				: NATURAL RANGE 0 TO 32;
+		VARIABLE datain_reg			: STD_LOGIC_VECTOR (4 downto 0);
 	BEGIN
 
 		IF (rst = '1') THEN 
-			dataout <= '0'
-			dataout_write_enable <= '0'
-			datain_read_enable <= '0'
-			datain_RAM_Access_Pointer <= (OTHERS => '0')
+			dataout <= (others => '0');
+			dataout_write_enable <= '0';
+			datain_read_enable <= '0';
+			RAM_Access_Pointer := (OTHERS => '0');
 
 
 		ELSIF (rising_edge(clk)) THEN
 
 			IF (timeing = 511) THEN
-				timeing = 0;
+				timeing := 0;
 			ELSE
-				timeing = timeing + 1;
+				timeing := timeing + 1;
 			END IF;
 
 			IF (state = 0 AND timeing = 0) THEN
@@ -72,7 +74,7 @@ ARCHITECTURE Behavioral OF bypass_decision IS
 					
 					datain_read_enable <= '1';
 					dataout_write_enable <= '0';
-					datain_reg <= datain;
+					datain_reg := datain;
 					state := 2;
 
 				END IF;
@@ -91,10 +93,10 @@ ARCHITECTURE Behavioral OF bypass_decision IS
 
 				state := 1;
 
-				IF (datain_RAM_Access_Pointer = X"1FF") THEN
-					datain_RAM_Access_Pointer <= (others => '0');
+				IF (RAM_Access_Pointer = X"1FF") THEN
+					RAM_Access_Pointer := (others => '0');
 				ELSE
-					datain_RAM_Access_Pointer <= datain_RAM_Access_Pointer + 1;
+					RAM_Access_Pointer := RAM_Access_Pointer + 1;
 				END IF;
 
 			END IF;
@@ -103,5 +105,6 @@ ARCHITECTURE Behavioral OF bypass_decision IS
 
 	END PROCESS;
 
+	datain_RAM_Access_Pointer <= RAM_Access_Pointer;
 
 END Behavioral;
