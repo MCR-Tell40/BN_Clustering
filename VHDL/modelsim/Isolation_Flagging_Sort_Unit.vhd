@@ -17,11 +17,9 @@ ENTITY Isolation_Flagging_Sort_Unit IS
   PORT(
 
    	rst 			: in 	std_logic;	
-
    	dataIn      	: in 	dataTrain;
    	parity 			: in 	std_logic; -- high if odd
    	clk				: in 	std_logic;
-
   	dataOut   		: out 	dataTrain
   );
 
@@ -46,7 +44,7 @@ BEGIN
 				IF ((i mod 2 = 1) AND parity = '1') OR ((i mod 2 = 0) AND parity = '0') THEN
 
 					-- check if switch is required -- sorting by both Chip ID and column
-					IF (to_integer(unsigned(dataIn(i)(23 downto 14))) > to_integer(unsigned(dataIn(i+1)(23 downto 14))) THEN
+					IF (to_integer(unsigned(dataIn(i)(23 downto 14))) > to_integer(unsigned(dataIn(i+1)(23 downto 14)))) THEN
 						-- make switch
 						inter_reg(i) 	:= dataIn(i+1);
 						inter_reg(i+1) 	:= dataIn(i);

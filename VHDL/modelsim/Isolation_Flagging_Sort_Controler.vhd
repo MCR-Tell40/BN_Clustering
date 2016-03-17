@@ -3,6 +3,12 @@
 -- Author Ben Jeffrey, Nicholas Mead
 -- Date Created 19/11/2015
 
+-- for processes going to implement 4 state process
+-- state 0 = waiting for data
+-- state 1 = sorting data
+-- state 2 = flag data
+-- state 3 = ship data out
+
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
@@ -16,11 +22,13 @@ ENTITY Isolation_Flagging_Sort_Controller IS
   port(
     
     global_rst			    : IN    std_logic;
- 	  global_clk_160MHz	  : IN    std_logic;
+  global_clk_160MHz	  : IN    std_logic;
     router_data_in		  : IN 	  dataTrain;
     train_size          : IN    std_logic_vector(7 downto 0);
     sorted_data_out     : OUT 	dataTrain;
-    process_complete    : INOUT   std_logic
+    process_complete    : INOUT std_logic;
+    ctrl_loop_in        : IN    std_logic;
+    ctrl_loop_out       : OUT   std_logic
   );
 END Isolation_Flagging_Sort_Controller;
 
@@ -29,14 +37,14 @@ ARCHITECTURE a OF Isolation_Flagging_Sort_Controller IS
 	-- ##### Components ##### --
 
   COMPONENT Isolation_Flagging_Sort_Unit IS
- 		PORT(
-  		rst 			 : in 	std_logic;	
-  		dataIn     : in 	dataTrain;
-      parity     : in   std_logic;
-      clk        : in   std_logic;
-   		dataOut    : out  dataTrain
-  	);
-	END COMPONENT;
+    PORT(
+      rst           : in   std_logic; 
+      dataIn        : in   dataTrain;
+      parity        : in   std_logic;
+      clk           : in   std_logic;
+      dataOut       : out  dataTrain
+    );
+  END COMPONENT;
 
   COMPONENT counter_8bit IS
     PORT(
@@ -47,12 +55,24 @@ ARCHITECTURE a OF Isolation_Flagging_Sort_Controller IS
     );
   END COMPONENT;
 
+  COMPONENT isolation_flagger IS
+    PORT(
+      rst       : in  std_logic;  
+      clk       : in  std_logic;
+      data_in   : in  datatrain;
+      data_out  : out datatrain
+    );
+  END COMPONENT;
+
 	-- ##### Data Busses ##### --
 	SIGNAL Router_Control        : dataTrain;
 	SIGNAL BubbleSort_Control	   : dataTrain;
 
   SIGNAL Control_DataOut       : dataTrain;
   SIGNAL Control_BubbleSort    : dataTrain;
+
+  SIGNAL Control_Flagging      : dataTrain;
+  SIGNAL Flagging_Control      : dataTrain;
 
 	-- ##### Validation Signals ##### --
   SIGNAL Control_Parity        : std_logic;
@@ -68,15 +88,19 @@ ARCHITECTURE a OF Isolation_Flagging_Sort_Controller IS
   SIGNAL counter_8bit_reset         : std_logic;
   SIGNAL counter_8bit_reset_global  : std_logic;
 
+  -- state variable --
+  SHARED VARIABLE state : integer range 0 to 2;
+
 BEGIN
   
   Sort_Unit : Isolation_Flagging_Sort_Unit
     PORT MAP (
-      rst             => Control_RST,
-      dataIn          => Control_BubbleSort,
-      parity          => Control_Parity,
-      clk             => Clock_BubbleSort,
-      dataOut         => BubbleSort_Control
+      rst            => Control_RST,
+      dataIn         => Control_BubbleSort,
+      parity         => Control_Parity,
+      clk            => Clock_BubbleSort,
+      dataOut        => BubbleSort_Control      
+      
     );
 
   itteration_counter : counter_8bit
@@ -87,17 +111,28 @@ BEGIN
       count => counter_8bit_value
       );
 
+  isol_flagging : isolation_flagger
+    PORT MAP (
+      rst         => Control_RST,
+      clk         => Clock_BubbleSort,
+      data_in     => Control_Flagging,
+      data_out    => Flagging_Control
+
+
+      );
+
+
   ------------------------------------------------------------------
   ---------------------- Control Process ---------------------------
 
   -- sorter
-  RST_Control       <= global_rst;  
-  Router_Control    <= router_data_in;
-  Clock_BubbleSort  <= global_clk_160MHz;
-  sorted_data_out   <= Control_DataOut;
-  Control_RST       <= RST_Control;
-
-
+  RST_Control         <= global_rst;  
+  Router_Control      <= router_data_in;
+  Clock_BubbleSort    <= global_clk_160MHz;
+  sorted_data_out     <= Control_DataOut;
+  Control_RST         <= RST_Control;
+ 
+    
   --counter_8bit
   counter_8bit_enable <= '1';
 
@@ -106,29 +141,50 @@ BEGIN
   PROCESS(global_clk_160MHz, global_rst)
   BEGIN
 
-    IF (RST_Control = '1') THEN 
-      Control_DataOut   <= reset_patten_train;
-      Control_BubbleSort <= reset_patten_train;
-      process_complete  <= '1';
-      Control_Parity <= '1';
+    IF (global_rst = '1') THEN 
+      Control_DataOut      <= reset_patten_train;
+      Control_BubbleSort   <= reset_patten_train;
+      process_complete     <= '1';
+      Control_Parity       <= '1';
+      ctrl_loop_out        <= '0';
+      state                := 0;
 
     ELSIF rising_edge(global_clk_160MHz) THEN     
 
-      IF (counter_8bit_value = train_size - 1) THEN
-        process_complete <= '1';
-        counter_8bit_reset <= '1';
-        Control_DataOut <= BubbleSort_Control;
+      IF state = 0  THEN 
+     
         Control_BubbleSort <= Router_Control;
-      ELSE
-        process_complete <= '0';
-        counter_8bit_reset <= '0';
-        Control_BubbleSort <= BubbleSort_Control;
+        state := 1;
+
+      ELSIF state = 1 THEN
+      
+        IF (counter_8bit_value = train_size - 1) THEN
+      
+          process_complete   <= '1';
+          counter_8bit_reset <= '1';
+          Control_Flagging   <= BubbleSort_Control;
+          state              := 2;
+        
+        ELSE  
+      
+          process_complete   <= '0';
+          counter_8bit_reset <= '0';
+          Control_BubbleSort <= BubbleSort_Control;
+      
+        END IF;
+
+        Control_Parity       <= NOT Control_Parity;
+     
+      ELSIF state = 2 THEN
+      
+        Control_DataOut      <= Flagging_Control;
+        ctrl_loop_out        <= ctrl_loop_in;
+        state                := 0;
+      
       END IF;
 
-      Control_Parity <= NOT Control_Parity;
-
     END IF;
-    
+  
   END PROCESS;
 
 END a;

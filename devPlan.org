@@ -5,17 +5,19 @@ Priority List [#A] highest, [#C] Lowest
 ** TODO Design + Build RAM-interface -> data routing unit			  :month:
 ** TODO Design + Build sorting sink -> interfaceing with MEP RAM	  :month:
 
+assignment Tue 8 march
+
 * Jobs Nick [1/3]
   DEADLINE: <2016-03-17 Thu>
-** DONE [#A] Design Presentation for working group				   :half_day:
-** TODO [#B] Upgrade sorting to Semi-Static Method				   :half_day:
-** TODO [#B] Design + Build Decision Unit - prelim 					  :1_day:
+** TODO [#A] Upgrade sorting to Semi-Static Method				   :half_day:
+** DONE [#B] Design Presentation for working group		   :half_day:
+** TODO [#B] Design + Build Decision Unit							  :1_day:
 
-* Jobs Ben [1/3]
+* Jobs Ben [2/3]
   DEADLINE: <2016-03-16 Wed>
 ** DONE [#A] Sort by column + chipID				:quarter_day:
 ** TODO [#B] Flagging Unit logic to not sort edge case between sensors :half_day:
-** TODO [#B] Sorting units upgrade to include 'loop flag'		   :half_day:
+** DONE [#B] Sorting units upgrade to include 'loop flag'	   :half_day:
 
 
 * Completed List [0/0]

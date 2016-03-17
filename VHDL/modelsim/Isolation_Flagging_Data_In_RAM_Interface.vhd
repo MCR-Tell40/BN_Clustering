@@ -28,7 +28,8 @@ ENTITY Isolation_Flagging_Data_In_RAM_Interface IS
 		--read_in_buffer 	: IN ARRAY(0 to read_buffer_size-1) OF std_logic_vector(word_length-1 downto 0);
 
 		read_adr 	: OUT std_logic_vector(adr_width-1 downto 0);
-		read_en		: OUT std_logic
+		read_en		: OUT std_logic;
+		loop_flag	: OUT std_logic
 
 	);
 END ENTITY;

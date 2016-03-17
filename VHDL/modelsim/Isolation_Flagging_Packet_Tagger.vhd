@@ -1,12 +1,11 @@
--- Bubble Sort Tops
--- Even/Odd defined by parity of LSB
+-- Isolation tagger
 -- Author Ben Jeffrey, Nicholas Mead
 -- Date Created 09/02/2016
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
-USE work.bubble_sort_package.all;
+USE work.Isolation_Flagging_Package.all;
 USE work.Detector_Constant_Declaration.all;
 
 
@@ -16,9 +15,7 @@ ENTITY isolation_flagger IS
 
    	rst 			: in 	std_logic;	
    	clk				: in 	std_logic;
-
    	data_in			: in 	datatrain;
-
    	data_out		: out 	datatrain
 
   );
@@ -40,20 +37,13 @@ BEGIN
 
 		ELSIF rising_edge(clk) THEN
 
-			IF (to_integer(unsigned(data_in(1)(13 downto 8))) - to_integer(unsigned(data_in(0)(13 downto 8)))) > 1 THEN
-			
-				-- data_in(0) is isolated
-				inter_reg(0) := data_in(0) OR x"80_00_00_00";
-			
-			ELSE
 
-				inter_reg(0) := data_in(0);
-
-			END IF;
+			inter_reg(0) := data_in(0);
+			inter_reg(OVERFLOW_SIZE-1) := data_in(OVERFLOW_SIZE-1);
 
 			IF (to_integer(unsigned(data_in(OVERFLOW_SIZE)(13 downto 8))) - to_integer(unsigned(data_in(OVERFLOW_SIZE-1)(13 downto 8)))) > 1 THEN
 
-				inter_reg(OVERFLOW_SIZE) := data_in(OVERFLOW_SIZE) OR x"80_00_00_00";
+				inter_reg(OVERFLOW_SIZE) := data_in(OVERFLOW_SIZE) OR x"80_00_00";
 
 			ELSE
 
@@ -61,12 +51,12 @@ BEGIN
 
 			END IF;
 
-			FOR i IN 1 to (OVERFLOW_SIZE - 1) LOOP
+			FOR i IN 1 to (OVERFLOW_SIZE - 2) LOOP
 
 				IF (to_integer(unsigned(data_in(i)(13 downto 8))) - to_integer(unsigned(data_in(i-1)(13 downto 8))) > 1) AND 
 					(to_integer(unsigned(data_in(i+1)(13 downto 8))) - to_integer(unsigned(data_in(i)(13 downto 8))) > 1) THEN
 
-					inter_reg(i) := data_in(i) OR x"80_00_00_00";
+					inter_reg(i) := data_in(i) OR x"80_00_00";
 
 				ELSE
 

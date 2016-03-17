@@ -109,7 +109,7 @@ PACKAGE Detector_Constant_Declaration IS
   constant skip_BXID_jump               : std_logic_vector(11 downto 0)   := X"00C";
 --
   -- Event Isolation Flagging
-  constant OVERFLOW_SIZE: INTEGER := 9; -- max significant bit
+  constant OVERFLOW_SIZE: INTEGER := 127; -- max significant bit
 
 
 END Detector_Constant_Declaration;
