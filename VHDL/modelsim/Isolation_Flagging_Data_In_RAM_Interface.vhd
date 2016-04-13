@@ -37,6 +37,44 @@ END ENTITY;
 -- Architecture
 ARCHITECTURE arch OF Isolation_Flagging_Data_In_RAM_Interface IS
 
+	VARIABLE state : INTEGER 2;
+
 BEGIN
+
+	PROCESS(clk, rst)
+	BEGIN
+
+		IF rst = '1' THEN
+			state := 1;
+		ELSIF rising_edge(clk) THEN
+
+			IF state = 0 THEN
+				--read from couting ram and point at corresponding SPP ram addr
+
+			ElSIF state = 1 THEN
+				-- decide if sorting
+
+				-- if sorting goto 2
+
+				-- if not sorting pass count to bypass - goto 0
+
+			ELSIF state = 2 THEN
+
+				-- read from SPP ram and send info to sorter 
+
+				-- once complete goto 3
+
+			ELSIF state = 3 THEN
+
+				-- pass 0 as count to bypass
+
+				-- goto 0
+
+			END IF;
+
+
+
+
+	END PROCESS;
 
 END arch;
