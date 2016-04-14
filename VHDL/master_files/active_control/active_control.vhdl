@@ -30,3 +30,21 @@ ENTITY Active_Control IS
 	);
 
 END Active_Control;
+
+ARCHITECTURE a OF Active_Control IS
+BEGIN
+
+	COMPONENT data_processor IS
+		PORT(
+		    global_rst			    : IN    std_logic;
+		    global_clk_160MHz	  : IN    std_logic;
+		    router_data_in		  : IN 	  dataTrain;
+		    train_size          : IN    std_logic_vector(7 downto 0);
+		    sorted_data_out     : OUT 	dataTrain;
+		    process_complete    : INOUT std_logic;
+		    ctrl_loop_in        : IN    std_logic;
+		    ctrl_loop_out       : OUT   std_logic
+		   );
+	END COMPONENT;
+
+end a;
