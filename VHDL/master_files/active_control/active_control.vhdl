@@ -27,6 +27,10 @@ ENTITY Active_Control IS
 		wr_en	:	OUT std_logic;
 		wr_buff :	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
 
+		-- Bypass Interace
+		FIFO_en :	OUT std_logic;
+		FIFO_buff:	OUt std_logic_vector (6 downto 0)
+
 	);
 
 END Active_Control;
