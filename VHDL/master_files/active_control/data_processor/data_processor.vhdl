@@ -142,13 +142,13 @@ BEGIN
     IF (rst = '1') THEN
 
       -- reset componants
-      sorter_rst    <= '1'
-      flagger_rst   <= '1'
-      counter_rst   <= '1'
+      sorter_rst    <= '1';
+      flagger_rst   <= '1';
+      counter_rst   <= '1';
 
       -- prep for restart
-      process_complete  <= '1'
-      counter_en        <= '0'
+      process_complete  <= '1';
+      counter_en        <= '0';
       state             := 0;
 
     ELSIF rising_edge(clk) THEN     
@@ -197,7 +197,7 @@ BEGIN
         --check if data has been read-out
         IF process_complete = '0' THEN --data has been read
           -- prep for state 0
-          process_complete <= '1'
+          process_complete <= '1';
           state := 0;
         END IF;
 
