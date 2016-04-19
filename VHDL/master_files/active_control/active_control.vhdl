@@ -40,14 +40,21 @@ BEGIN
 
 	COMPONENT data_processor IS
 		PORT(
-		    global_rst			: IN    std_logic;
-		    global_clk_160MHz	: IN    std_logic;
-		    router_data_in		: IN 	dataTrain;
-		    train_size          : IN    std_logic_vector(7 downto 0);
-		    sorted_data_out     : OUT 	dataTrain;
+			-- Common control signals
+		    rst		: IN    std_logic; --rst
+		    clk	  : IN    std_logic; --clk
+		    
+		    -- Data transfer
+		    data_in     : IN 	  dataTrain; --data_in
+		    data_out    : OUT 	dataTrain; --data_out
+		    data_size   : IN    std_logic_vector(7 downto 0);
+		    
+		    -- Data processor active flag
 		    process_complete    : INOUT std_logic;
-		    ctrl_loop_in        : IN    std_logic;
-		    ctrl_loop_out       : OUT   std_logic
+
+		    -- BCID Address
+		    BCID_Addr_in        : IN    std_logic_vector(RAM_ADDR_SIZE-1 downto 0); 
+		    BCID_Addr_out       : OUT   std_logic_vector(RAM_ADDR_SIZE-1 downto 0)
 		   );
 	END COMPONENT;
 
