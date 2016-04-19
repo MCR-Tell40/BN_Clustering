@@ -8,6 +8,7 @@
 -- state 1 = sorting data
 -- state 2 = flag data
 -- state 3 = ship data out
+-- state 4 = wait for data to be read out
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
@@ -21,14 +22,21 @@ USE work.Detector_Constant_Declaration.all;
 ENTITY Data_Processor IS
   port(
     
-    global_rst			    : IN    std_logic;
-    global_clk_160MHz	  : IN    std_logic;
-    router_data_in		  : IN 	  dataTrain;
-    train_size          : IN    std_logic_vector(7 downto 0);
-    sorted_data_out     : OUT 	dataTrain;
+    -- Common control signals
+    rst		: IN    std_logic; --rst
+    clk	  : IN    std_logic; --clk
+    
+    -- Data transfer
+    data_in     : IN 	  dataTrain; --data_in
+    data_out    : OUT 	dataTrain; --data_out
+    data_size   : IN    std_logic_vector(7 downto 0);
+    
+    -- Data processor active flag
     process_complete    : INOUT std_logic;
-    ctrl_loop_in        : IN    std_logic;
-    ctrl_loop_out       : OUT   std_logic
+
+    -- BCID Address
+    BCID_Addr_in        : IN    std_logic_vector(RAM_ADDR_SIZE-1 downto 0); 
+    BCID_Addr_out       : OUT   std_logic_vector(RAM_ADDR_SIZE-1 downto 0)
   );
 END Data_Processor;
 
@@ -39,10 +47,10 @@ ARCHITECTURE a OF Data_Processor IS
   COMPONENT Sorter IS
     PORT(
       rst           : in   std_logic; 
-      dataIn        : in   dataTrain;
       parity        : in   std_logic;
       clk           : in   std_logic;
-      dataOut       : out  dataTrain
+      data_in       : in   dataTrain;
+      data_out      : out  dataTrain
     );
   END COMPONENT;
 
@@ -64,124 +72,135 @@ ARCHITECTURE a OF Data_Processor IS
     );
   END COMPONENT;
 
-	-- ##### Data Busses ##### --
-	SIGNAL Router_Control        : dataTrain;
-	SIGNAL BubbleSort_Control	   : dataTrain;
+  -- Internal Signals
+  SIGNAL internal_clk   : std_logic;
+  SIGNAL internal_reg   : datatrain;
+  SIGNAL internal_size  : std_logic_vector(7 downto 0); 
 
-  SIGNAL Control_DataOut       : dataTrain;
-  SIGNAL Control_BubbleSort    : dataTrain;
+  SHARED VARIABLE state : integer range 0 to 4;
 
-  SIGNAL Control_Flagging      : dataTrain;
-  SIGNAL Flagging_Control      : dataTrain;
+  SIGNAL BCID_Addr : std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
 
-	-- ##### Validation Signals ##### --
-  SIGNAL Control_Parity        : std_logic;
+  SIGNAL sorter_rst,      : std_logic;
+  SIGNAL sorter_data_in   : datatrain;
+  SIGNAL sorter_data_out  : datatrain;
+  SIGNAL sorter_parity    : std_logic;
+  
+  SIGNAL counter_rst    : std_logic;
+  SIGNAL counter_en     : std_logic;
+  SIGNAL counter_value  : std_logic_vector(7 downto 0);
 
-	-- ##### Clock and Reset ##### --
-  SIGNAL Control_RST           : std_logic;
-  SIGNAL RST_Control           : std_logic; 
-  SIGNAL Clock_BubbleSort      : std_logic;
-
-  -- ##### counter_8bit ##### --
-  SIGNAL counter_8bit_enable        : std_logic;
-  SIGNAL counter_8bit_value         : std_logic_vector(7 downto 0);
-  SIGNAL counter_8bit_reset         : std_logic;
-  SIGNAL counter_8bit_reset_global  : std_logic;
-
-  -- state variable --
-  SHARED VARIABLE state : integer range 0 to 2;
+  SIGNAL flagger_rst      : std_logic;     
+  SIGNAL flagger_data_in  : datatrain;
+  SIGNAL flagger_data_out : datatrain;
 
 BEGIN
-  
-  Sort_Unit : Sorter
+  ------------------------------------------------------------------
+  ---------------------- Port Mapping ------------------------------ 
+
+  Sorter : Sorter
     PORT MAP (
-      rst            => Control_RST,
-      dataIn         => Control_BubbleSort,
-      parity         => Control_Parity,
-      clk            => Clock_BubbleSort,
-      dataOut        => BubbleSort_Control      
+      clk       => internal_clk,
+      rst       => sorter_rst,
       
+      dataIn    => sorter_data_in,
+      dataOut   => sorter_data_out      
+      
+      parity    => sorter_parity,
     );
 
-  itteration_counter : counter_8bit
+  Counter : counter_8bit
     PORT MAP (
-      clk   => Clock_BubbleSort,
-      rst   => counter_8bit_reset_global,
-      en    => counter_8bit_enable,
-      count => counter_8bit_value
+      clk   => internal_clk,
+      rst   => counter_rst,
+
+      en    => counter_en,
+      count => counter_value
       );
 
-  isol_flagging : Flagger
+  Flagger : Flagger
     PORT MAP (
-      rst         => Control_RST,
-      clk         => Clock_BubbleSort,
-      data_in     => Control_Flagging,
-      data_out    => Flagging_Control
-
-
+      clk         => internal_clk,
+      rst         => flagger_rst,
+      
+      data_in     => flagger_data_in,
+      data_out    => flagger_data_out
       );
 
 
   ------------------------------------------------------------------
   ---------------------- Control Process ---------------------------
 
-  -- sorter
-  RST_Control         <= global_rst;  
-  Router_Control      <= router_data_in;
-  Clock_BubbleSort    <= global_clk_160MHz;
-  sorted_data_out     <= Control_DataOut;
-  Control_RST         <= RST_Control;
- 
-    
-  --counter_8bit
-  counter_8bit_enable <= '1';
-  counter_8bit_reset_global <= counter_8bit_reset OR Control_RST;
+  -- Constant Signal Propergation
 
+  internal_clk <= clk;
+  sorter_data_in <= internal_reg;
 
-
-  PROCESS(global_clk_160MHz, global_rst)
+  PROCESS(clk, rst)
   BEGIN
 
-    IF (global_rst = '1') THEN 
-      Control_DataOut      <= reset_patten_train;
-      Control_BubbleSort   <= reset_patten_train;
-      process_complete     <= '1';
-      Control_Parity       <= '1';
-      ctrl_loop_out        <= '0';
-      state                := 0;
+    IF (rst = '1') THEN
 
-    ELSIF rising_edge(global_clk_160MHz) THEN     
+      -- reset componants
+      sorter_rst    <= '1'
+      flagger_rst   <= '1'
+      counter_rst   <= '1'
+
+      -- prep for restart
+      process_complete  <= '1'
+      counter_en        <= '0'
+      state             := 0;
+
+    ELSIF rising_edge(clk) THEN     
 
       IF state = 0  THEN 
-     
-        Control_BubbleSort <= Router_Control;
-        state := 1;
 
-      ELSIF state = 1 THEN
-      
-        IF (counter_8bit_value = train_size - 1) THEN
-      
-          process_complete   <= '1';
-          counter_8bit_reset <= '1';
-          Control_Flagging   <= BubbleSort_Control;
-          state              := 2;
-        
-        ELSE  
-      
-          process_complete   <= '0';
-          counter_8bit_reset <= '0';
-          Control_BubbleSort <= BubbleSort_Control;
-      
+        -- collect data
+        internal_reg  <= data_in;
+        internal_size <= data_size;
+        BCID_Addr     <= BCID_Addr_in;
+
+        IF (process_complete = '0') THEN -- new data was read in
+          -- prep for state 1
+          counter_rst   <= '1';
+          counter_en    <= '0';
+          -- move to next state
+          state := 1;
         END IF;
 
-        Control_Parity       <= NOT Control_Parity;
+      ELSIF state = 1 THEN -- sort data
+
+        -- count time in state      
+        counter_rst <= '0';
+        counter_en  <= '1';
+
+        -- feedback sorter
+        sorter_parity <= NOT sorter_parity;
+        internal_reg  <= sorter_data_out;
+
+        IF (counter_value = internal_size) THEN --sort is complete
+          -- move to next state
+          state := 2;
+        END IF;
      
       ELSIF state = 2 THEN
-      
-        Control_DataOut      <= Flagging_Control;
-        ctrl_loop_out        <= ctrl_loop_in;
-        state                := 0;
-      
+        flagger_data_in <= internal_reg;
+        state := 3;
+
+      ELSIF state = 3 THEN
+        flagger_data_out  <= data_out;
+        process_complete  <= '1';
+        BCID_Addr_out     <= BCID_Addr;
+        state := 4;
+
+      ELSIF state = 4 THEN
+        --check if data has been read-out
+        IF process_complete = '0' THEN --data has been read
+          -- prep for state 0
+          process_complete <= '1'
+          state := 0;
+        END IF;
+
       END IF;
 
     END IF;
