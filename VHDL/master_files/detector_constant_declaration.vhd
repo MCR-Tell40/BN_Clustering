@@ -112,7 +112,7 @@ PACKAGE Detector_Constant_Declaration IS
   constant OVERFLOW_SIZE: INTEGER := 127; -- max significant bit
   constant IF_WORD_SIZE:  INTEGER := 24;
   constant RAM_ADDR_SIZE: INTEGER := 9;
-
+  CONSTANT data_processor_count : INTEGER := 16;
 
 
 END Detector_Constant_Declaration;
