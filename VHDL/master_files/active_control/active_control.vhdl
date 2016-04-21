@@ -63,6 +63,7 @@ ARCHITECTURE a OF Active_Control IS
 		    data_size_out 	: OUT   std_logic_vector(7 downto 0);
 		    
 		    -- Data processor active flag
+		    process_ready 		: INOUT std_logic;
 		    process_complete    : INOUT std_logic;
 
 		    -- BCID Address
@@ -86,6 +87,7 @@ BEGIN
 		    processor_size_out(I),
 		    
 		    -- Data processor active flag
+		    processor_ready(I),
 		    processor_complete(I),
 
 		    -- BCID Address
@@ -94,7 +96,7 @@ BEGIN
 			);
 	END GENERATE GEN_processors;
 
-	PROCESS(rst, clk)
+	PROCESS(rst, clk) -- data in process
 	BEGIN
 
 		IF (rst = '1') THEN
@@ -159,14 +161,14 @@ BEGIN
 
 			ELSIF in_state = 2 THEN
 
-				IF processor_complete(processor_num) = '0' THEN -- Check if processor is free
+				IF processor_ready(processor_num) = '0' THEN -- Check if processor is free
 					processor_num := processor_num + 1; -- This **shouldn't** ever be needed, but just in case.
 				ELSE
 					-- pass data to processor
 					processor_in 		(processor_num) <= in_register;
 					processor_addr_in 	(processor_num) <= addr_store;
 					processor_size_in 	(processor_num) <= size_store;
-					processor_complete 	(processor_num) <= '0';
+					processor_ready 	(processor_num) <= '0';
 
 					-- prep for next addr
 					IF rd_addr = '0X1FF' THEN
@@ -194,6 +196,12 @@ BEGIN
 
 	END PROCESS;
 
+	PROCESS(rst,clk) -- data out process
+	BEGIN
+
+
+
+	END PROCESS;
 	
 
 end a;

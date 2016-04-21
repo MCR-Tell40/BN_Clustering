@@ -32,6 +32,7 @@ ENTITY Data_Processor IS
     data_size   : IN    std_logic_vector(7 downto 0);
     
     -- Data processor active flag
+    process_ready       : INOUT std_logic;
     process_complete    : INOUT std_logic;
 
     -- BCID Address
@@ -160,7 +161,7 @@ BEGIN
         internal_size <= data_size;
         BCID_Addr     <= BCID_Addr_in;
 
-        IF (process_complete = '0') THEN -- new data was read in
+        IF (process_ready = '0') THEN -- new data was read in
           -- prep for state 1
           counter_rst   <= '1';
           counter_en    <= '0';
@@ -197,7 +198,7 @@ BEGIN
         --check if data has been read-out
         IF process_complete = '0' THEN --data has been read
           -- prep for state 0
-          process_complete <= '1';
+          process_ready <= '1';
           state := 0;
         END IF;
 
