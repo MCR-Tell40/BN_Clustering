@@ -25,14 +25,19 @@ ENTITY Active_Control IS
 		rd_en	:	OUT std_logic;
 		rd_buff :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
 
+		-- Train Size RAM interface ct=count
+		ct_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
+		ct_en	:	OUT std_logic;
+		ct_buff :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+
 		-- MEP Interface
 		wr_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
 		wr_en	:	OUT std_logic;
 		wr_buff :	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
 
 		-- Bypass Interace
-		FIFO_en :	OUT std_logic;
-		FIFO_buff:	OUt std_logic_vector (6 downto 0)
+		FIFO_wr_en 	:	OUT std_logic;
+		FIFO_buff	:	OUt std_logic_vector (6 downto 0)
 	);
 
 END Active_Control;
@@ -48,7 +53,7 @@ ARCHITECTURE a OF Active_Control IS
 		    clk 	: IN    std_logic; --clk
 		    
 		    -- Data transfer
-		    data_in     : IN 	  dataTrain; --data_in
+		    data_in     : IN 	dataTrain; --data_in
 		    data_out    : OUT 	dataTrain; --data_out
 		    data_size   : IN    std_logic_vector(7 downto 0);
 		    
