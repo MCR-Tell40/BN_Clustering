@@ -12,8 +12,11 @@ USE work.Detector_Constant_Declaration.all;
 
 ENTITY Active_Control IS 
 
-	PORT(
+	GENERIC(
+		CONSTANT data_processor_count : NATURAL := 16;
+	);
 
+	PORT(
 		-- standard
 		clk, rst : IN std_logic;
 
@@ -30,19 +33,19 @@ ENTITY Active_Control IS
 		-- Bypass Interace
 		FIFO_en :	OUT std_logic;
 		FIFO_buff:	OUt std_logic_vector (6 downto 0)
-
 	);
 
 END Active_Control;
 
 ARCHITECTURE a OF Active_Control IS
-BEGIN
+
+	SHARED VARIABLE state : INTEGER range 0 to 4;
 
 	COMPONENT data_processor IS
 		PORT(
 			-- Common control signals
 		    rst		: IN    std_logic; --rst
-		    clk	  : IN    std_logic; --clk
+		    clk 	: IN    std_logic; --clk
 		    
 		    -- Data transfer
 		    data_in     : IN 	  dataTrain; --data_in
@@ -57,5 +60,28 @@ BEGIN
 		    BCID_Addr_out       : OUT   std_logic_vector(RAM_ADDR_SIZE-1 downto 0)
 		   );
 	END COMPONENT;
+
+BEGIN
+	
+	GEN_processors: for I in 0 to data_processor_count-1 GENERATE
+		processor_X: data_processor port map(
+			rst,
+		    clk,
+		    
+		    -- Data transfer
+		    processor_in(I),
+		    processor_out(I),
+		    processor_size(I),
+		    
+		    -- Data processor active flag
+		    processor_complete(I),
+
+		    -- BCID Address
+		    processor_Addr_in(I),
+		    processor_Addr_out(I)
+			);
+	END GENERATE GEN_processors;
+
+	
 
 end a;
