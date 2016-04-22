@@ -12,10 +12,6 @@ USE work.Detector_Constant_Declaration.all;
 
 ENTITY Active_Control IS 
 
-	GENERIC(
-		CONSTANT data_processor_count : NATURAL := 16;
-	);
-
 	PORT(
 		-- standard
 		clk, rst : IN std_logic;
