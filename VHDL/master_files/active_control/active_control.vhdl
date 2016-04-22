@@ -19,20 +19,20 @@ ENTITY Active_Control IS
 		-- Router Interface
 		rd_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
 		rd_en	:	OUT std_logic;
-		rd_buff :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		rd_data :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
 
 		-- Train Size RAM interface ct=count
 		ct_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
-		ct_buff :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		ct_data :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
 
 		-- MEP Interface
 		wr_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
 		wr_en	:	OUT std_logic;
-		wr_buff :	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		wr_data :	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
 
 		-- Bypass Interace
 		FIFO_wr_en 	:	OUT std_logic;
-		FIFO_buff	:	OUt std_logic_vector (6 downto 0)
+		FIFO_data	:	OUt std_logic_vector (6 downto 0)
 	);
 
 END Active_Control;
@@ -40,20 +40,20 @@ END Active_Control;
 ARCHITECTURE a OF Active_Control IS
 
 	-- in process variables
-	SHARED VARIABLE in_state 			: INTEGER range 0 to 4;
-	SHARED VARIABLE in_data_store 		: datatrain;
-	SHARED VARIABLE in_processor_num 	: INTEGER range 0 to data_processor_count-1;
-	SHARED VARIABLE in_bcid_store		: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
-	SHARED VARIABLE in_size_store		: std_logic_vector(7 downto 0);
-	SHARED VARIABLE in_rd_itteration : INTEGER range 0 to 7;
+	SHARED VARIABLE rd_state 			: INTEGER range 0 to 4;
+	SHARED VARIABLE rd_data_store 		: datatrain;
+	SHARED VARIABLE rd_processor_num 	: INTEGER range 0 to data_processor_count-1;
+	SHARED VARIABLE rd_bcid_store		: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
+	SHARED VARIABLE rd_size_store		: std_logic_vector(7 downto 0);
+	SHARED VARIABLE rd_itteration : INTEGER range 0 to 7;
 
 	-- out process variables
-	SHARED VARIABLE out_state 			: INTEGER range 0 to 4;
-	SHARED VARIABLE out_processor_num 	: INTEGER range 0 to data_processor_count-1;
-	SHARED VARIABLE out_data_store 		: datatrain;
-	SHARED VARIABLE out_addr_store		: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
-	SHARED VARIABLE out_size_store		: std_logic_vector(7 downto 0);
-	SHARED VARIABLE out_wr_itteration : INTEGER range 0 to 7;
+	SHARED VARIABLE wr_state 			: INTEGER range 0 to 4;
+	SHARED VARIABLE wr_processor_num 	: INTEGER range 0 to data_processor_count-1;
+	SHARED VARIABLE wr_data_store 		: datatrain;
+	SHARED VARIABLE wr_addr_store		: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
+	SHARED VARIABLE wr_size_store		: std_logic_vector(7 downto 0);
+	SHARED VARIABLE wr_wr_itteration : INTEGER range 0 to 7;
 
 	COMPONENT data_processor IS
 		PORT(
@@ -107,37 +107,36 @@ BEGIN
 
 		IF (rst = '1') THEN
 
-			rd_addr <= '0X000';
 			rd_en <= '0';
 
 			ct_addr <= '0X000';
 
 			FIF0_wr_en <= '0'
 
-			in_state := 0;
+			rd_state := 0;
 
-			in_processor_num := 0;
+			rd_processor_num := 0;
 
 		ELSIF rising_edge(clk) THEN
 
-			IF in_state = 0 THEN
+			IF rd_state = 0 THEN
 
-				IF ct_buff <= OVERFLOW_SIZE AND ct_buff != '0X000' THEN
+				IF ct_data <= OVERFLOW_SIZE AND ct_data != '0X000' THEN
 
 					-- mark as processed
-					FIFO_buff <= (OTHERS => '0');
+					FIFO_data <= (OTHERS => '0');
 					FIFO_wr_en <= '1';
 
 					-- store addr and size
-					in_bcid_store <= ct_addr;
-					in_size_store <= ct_buff;
+					rd_bcid_store <= ct_addr;
+					rd_size_store <= ct_data;
 
 					-- read data in
-					in_state := in_state + 1;
+					rd_state := 1;
 				ELSE
 
 					-- flag for bypass
-					FIFO_buff <= ct_buff;
+					FIFO_data <= ct_data;
 					FIFO_wr_en <= '1';
 
 					-- prep for next addr
@@ -153,25 +152,27 @@ BEGIN
 						ct_addr <= ct_addr + 1;
 					END IF;
 
-			ELSIF in_state = 1 THEN
+			ELSIF rd_state = 1 THEN
+
+				FIFO_wr_en <= '0';
 
 				-- Bens read from ram code goes here
-				in_data_store <= 'Full Data train' -- sudo code
+				rd_data_store <= 'Full Data train' -- sudo code
 
 				-- prep for next state
-				in_state := in_state + 1;
-				in_processor_num := in_processor_num + 1;
+				rd_state := rd_state + 1;
+				rd_processor_num := rd_processor_num + 1;
 
-			ELSIF in_state = 2 THEN
+			ELSIF rd_state = 2 THEN
 
-				IF processor_ready(in_processor_num) = '0' THEN -- Check if processor is free
-					in_processor_num := in_processor_num + 1; -- This **shouldn't** ever be needed, but just in case.
+				IF processor_ready(rd_processor_num) = '0' THEN -- Check if processor is free
+					rd_processor_num := rd_processor_num + 1; -- This **shouldn't** ever be needed, but just in case.
 				ELSE
 					-- pass data to processor
-					processor_in 		(in_processor_num) <= in_data_store;
-					processor_bcid_in 	(in_processor_num) <= in_bcid_store;
-					processor_size_in 	(in_processor_num) <= in_size_store;
-					processor_ready 	(in_processor_num) <= '0';
+					processor_in 		(rd_processor_num) <= rd_data_store;
+					processor_bcid_in 	(rd_processor_num) <= rd_bcid_store;
+					processor_size_in 	(rd_processor_num) <= rd_size_store;
+					processor_ready 	(rd_processor_num) <= '0';
 
 					-- prep for next addr
 					IF rd_addr = '0X1FF' THEN
@@ -186,23 +187,17 @@ BEGIN
 						ct_addr <= ct_addr + 1;
 					END IF;
 
-					in_state := 0;
+					rd_state := 0;
 
 				END IF;
-
-
 			END IF;
-
-
-
 		END IF;
 
 	END PROCESS;
 
 	-- continious input assignment	
-	rd_addr <= in_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(in_rd_itteration, sppram_rd_address_size - 1));
-	rd_buff <= in_data_split(in_rd_itteration);
-
+	rd_addr <= rd_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(rd_itteration, sppram_rd_address_size - 1));
+	rd_data <= rd_data_split(rd_itteration);
 
 	PROCESS(rst,clk) -- data out process
 	BEGIN
@@ -210,41 +205,41 @@ BEGIN
 		IF rst = '1' THEN
 
 			wr_en <= '0';
-			out_processor_num := 0;
+			wr_processor_num := 0;
 
 		ELSIF rising_edge(clk) THEN
 
-			IF out_state = 0 THEN -- look for finished processor
+			IF wr_state = 0 THEN -- look for finished processor
 
 
-				IF process_complete(out_processor_num) = '1' THEN
+				IF process_complete(wr_processor_num) = '1' THEN
 
 					-- collect from processor
-					out_data_store <= processor_out(out_processor_num);
-					out_size_store <= processor_size_out(out_processor_num);
-					out_bcid_store <= processor_bcid_out(out_processor_num);
+					wr_data_store <= processor_out(wr_processor_num);
+					wr_size_store <= processor_size_out(wr_processor_num);
+					wr_bcid_store <= processor_bcid_out(wr_processor_num);
 
 					-- signal collection
-					processor_complete(out_processor_num) <= '0';
+					processor_complete(wr_processor_num) <= '0';
 
 					-- next state prep
-					out_state := 1;
+					wr_state := 1;
 					wr_en <= '1';
-					out_wr_itteration := 0;
+					wr_wr_itteration := 0;
 
 				ELSE
 					-- check next processor
-					out_processor_num := out_processor_num + 1;
+					wr_processor_num := wr_processor_num + 1;
 				END
 
-			ELSIF out_state = 1 THEN -- read out 
+			ELSIF wr_state = 1 THEN -- read out 
 
 				-- check if last itteration
-				IF out_wr_itteration*16 >= out_size_store THEN
+				IF wr_wr_itteration*16 >= wr_size_store THEN
 					state := 0;
 					wr_en <= '0'
 				ELSE
-					out_wr_itteration := out_wr_itteration + 1;
+					wr_wr_itteration := wr_wr_itteration + 1;
 				END IF;
 
 			END IF;
@@ -254,7 +249,7 @@ BEGIN
 	END PROCESS;
 	
 	-- continious output assignment	
-	wr_addr <= out_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(out_wr_itteration, sppram_wr_address_size - 1));
-	wr_buff <= out_data_split(out_wr_itteration);
+	wr_addr <= wr_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(wr_wr_itteration, sppram_wr_address_size - 1));
+	wr_data <= wr_data_split(wr_wr_itteration);
 
 end a;
