@@ -43,11 +43,21 @@ END Active_Control;
 
 ARCHITECTURE a OF Active_Control IS
 
-	SHARED VARIABLE in_state 		: INTEGER range 0 to 4;
-	SHARED VARIABLE in_register 	: datatrain;
-	SHARED VARIABLE processor_num 	: INTEGER range 0 to data_processor_count-1;
-	SHARED VARIABLE addr_store		: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
-	SHARED VARIABLE size_store		: std_logic_vector(7 downto 0);
+	-- in process variables
+	SHARED VARIABLE in_state 			: INTEGER range 0 to 4;
+	SHARED VARIABLE in_data_store 		: datatrain;
+	SHARED VARIABLE in_processor_num 	: INTEGER range 0 to data_processor_count-1;
+	SHARED VARIABLE in_bcid_store		: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
+	SHARED VARIABLE in_size_store		: std_logic_vector(7 downto 0);
+	SHARED VARIABLE in_rd_itteration : INTEGER range 0 to 7;
+
+	-- out process variables
+	SHARED VARIABLE out_state 			: INTEGER range 0 to 4;
+	SHARED VARIABLE out_processor_num 	: INTEGER range 0 to data_processor_count-1;
+	SHARED VARIABLE out_data_store 		: datatrain;
+	SHARED VARIABLE out_addr_store		: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
+	SHARED VARIABLE out_size_store		: std_logic_vector(7 downto 0);
+	SHARED VARIABLE out_wr_itteration : INTEGER range 0 to 7;
 
 	COMPONENT data_processor IS
 		PORT(
@@ -67,8 +77,8 @@ ARCHITECTURE a OF Active_Control IS
 		    process_complete    : INOUT std_logic;
 
 		    -- BCID Address
-		    BCID_Addr_in        : IN    std_logic_vector(RAM_ADDR_SIZE-1 downto 0); 
-		    BCID_Addr_out       : OUT   std_logic_vector(RAM_ADDR_SIZE-1 downto 0)
+		    BCID_in        : IN    std_logic_vector(RAM_ADDR_SIZE-1 downto 0); 
+		    BCID_out       : OUT   std_logic_vector(RAM_ADDR_SIZE-1 downto 0)
 		   );
 	END COMPONENT;
 
@@ -91,8 +101,8 @@ BEGIN
 		    processor_complete(I),
 
 		    -- BCID Address
-		    processor_Addr_in(I),
-		    processor_Addr_out(I)
+		    processor_bcid_in(I),
+		    processor_bcid_out(I)
 			);
 	END GENERATE GEN_processors;
 
@@ -106,14 +116,11 @@ BEGIN
 
 			ct_addr <= '0X000';
 
-			wr_addr <= '0X000';
-			wr_en <= '0';
-
 			FIF0_wr_en <= '0'
 
 			in_state := 0;
 
-			processor_num := 0;
+			in_processor_num := 0;
 
 		ELSIF rising_edge(clk) THEN
 
@@ -126,8 +133,8 @@ BEGIN
 					FIFO_wr_en <= '1';
 
 					-- store addr and size
-					addr_store <= ct_addr;
-					size_store <= ct_buff;
+					in_bcid_store <= ct_addr;
+					in_size_store <= ct_buff;
 
 					-- read data in
 					in_state := in_state + 1;
@@ -153,22 +160,22 @@ BEGIN
 			ELSIF in_state = 1 THEN
 
 				-- Bens read from ram code goes here
-				in_register <= 'Full Data train' -- sudo code
+				in_data_store <= 'Full Data train' -- sudo code
 
 				-- prep for next state
 				in_state := in_state + 1;
-				processor_num := processor_num + 1;
+				in_processor_num := in_processor_num + 1;
 
 			ELSIF in_state = 2 THEN
 
-				IF processor_ready(processor_num) = '0' THEN -- Check if processor is free
-					processor_num := processor_num + 1; -- This **shouldn't** ever be needed, but just in case.
+				IF processor_ready(in_processor_num) = '0' THEN -- Check if processor is free
+					in_processor_num := in_processor_num + 1; -- This **shouldn't** ever be needed, but just in case.
 				ELSE
 					-- pass data to processor
-					processor_in 		(processor_num) <= in_register;
-					processor_addr_in 	(processor_num) <= addr_store;
-					processor_size_in 	(processor_num) <= size_store;
-					processor_ready 	(processor_num) <= '0';
+					processor_in 		(in_processor_num) <= in_data_store;
+					processor_bcid_in 	(in_processor_num) <= in_bcid_store;
+					processor_size_in 	(in_processor_num) <= in_size_store;
+					processor_ready 	(in_processor_num) <= '0';
 
 					-- prep for next addr
 					IF rd_addr = '0X1FF' THEN
@@ -196,12 +203,62 @@ BEGIN
 
 	END PROCESS;
 
+	-- continious input assignment	
+	rd_addr <= in_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(in_rd_itteration, sppram_rd_address_size - 1));
+	rd_buff <= in_data_split(in_rd_itteration);
+
+
 	PROCESS(rst,clk) -- data out process
 	BEGIN
 
+		IF rst = '1' THEN
 
+			wr_en <= '0';
+			out_processor_num := 0;
+
+		ELSIF rising_edge(clk) THEN
+
+			IF out_state = 0 THEN -- look for finished processor
+
+
+				IF process_complete(out_processor_num) = '1' THEN
+
+					-- collect from processor
+					out_data_store <= processor_out(out_processor_num);
+					out_size_store <= processor_size_out(out_processor_num);
+					out_bcid_store <= processor_bcid_out(out_processor_num);
+
+					-- signal collection
+					processor_complete(out_processor_num) <= '0';
+
+					-- next state prep
+					out_state := 1;
+					wr_en <= '1';
+					out_wr_itteration := 0;
+
+				ELSE
+					-- check next processor
+					out_processor_num := out_processor_num + 1;
+				END
+
+			ELSIF out_state = 1 THEN -- read out 
+
+				-- check if last itteration
+				IF out_wr_itteration*16 >= out_size_store THEN
+					state := 0;
+					wr_en <= '0'
+				ELSE
+					out_wr_itteration := out_wr_itteration + 1;
+				END IF;
+
+			END IF;
+
+		END IF;
 
 	END PROCESS;
 	
+	-- continious output assignment	
+	wr_addr <= out_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(out_wr_itteration, sppram_wr_address_size - 1));
+	wr_buff <= out_data_split(out_wr_itteration);
 
 end a;
