@@ -21,24 +21,24 @@ END split_datatrain;
 
 architecture a of split_datatrain is
 	-- internal register
-	signal internal_reg : datatrain_wr;
+	signal inter_reg : datatrain_wr;
 begin
 	process(reset)
 	begin
 
 		if reset = '1' then
-			internal_reg <= (others => (others <= '0'));
+			inter_reg <= reset_pattern_wrtrain;
 		else 
 			-- load the input datatrain into an internal register
 			-- need to split up into individual SPPs
 			for i in 0 to 7 loop 
 				for j in 0 to 15 loop
-					internal_reg(i)(((j+1)*32)-1 downto 32*j) := data_in(16*i + j)
+					inter_reg(i)(((j+1)*32)-1 downto 32*j) := data_in(16*i + j)
 				END loop;
 			end loop;
 		end if;
 		-- offload internal register to output
-		data_out <= internal_reg;
+		data_out <= inter_reg;
 	end process;
 end architecture ; 
 

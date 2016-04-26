@@ -12,12 +12,15 @@ USE work.Detector_Constant_Declaration.all;
 PACKAGE Isolation_Flagging_Package IS 
 
 	-- type def for array of std logic vectors
-	TYPE dataTrain 		IS ARRAY(OVERFLOW_SIZE downto 0) OF std_logic_vector(31 downto 0);
-	TYPE dataTrain_rd 	IS ARRAY(7 downto 0) OF std_logic_vector(sppram_rd_datasize-1 downto 0);
-	TYPE dataTrain_wr 	IS ARRAY(7 downto 0) OF std_logic_vector((32*16)-1 downto 0);
+	TYPE dataTrain 		IS ARRAY(MAX_FLAG_SIZE - 1 downto 0) OF std_logic_vector(31 downto 0);
+	TYPE dataTrain_rd 	IS ARRAY(7 downto 0) OF std_logic_vector(RD_WORD_SIZE - 1 downto 0);
+	TYPE dataTrain_wr 	IS ARRAY(7 downto 0) OF std_logic_vector(WR_WORD_SIZE - 1  downto 0);
 	
 
-	CONSTANT reset_patten_spp    : std_logic_vector(23 downto 0) := (others => '0');
-	CONSTANT reset_patten_train  : dataTrain := (others => reset_patten_spp);
+	CONSTANT reset_pattern_spp    : std_logic_vector(31 downto 0) := (others => '0');
+	CONSTANT reset_pattern_train  : dataTrain := (others => reset_pattern_spp);
 	
+	CONSTANT reset_pattern_wr	  : std_logic_vector(WR_WORD_SIZE downto 0) := (others => '0');
+	CONSTANT reset_pattern_wrtrain: dataTrain_wr := (others => reset_pattern_train);
+
 END Isolation_Flagging_Package;

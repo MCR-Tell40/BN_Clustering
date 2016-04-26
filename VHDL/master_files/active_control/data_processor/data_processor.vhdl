@@ -35,9 +35,9 @@ ENTITY Data_Processor IS
     process_ready       : INOUT std_logic;
     process_complete    : INOUT std_logic;
 
-    -- BCID Address
-    BCID_Addr_in        : IN    std_logic_vector(RAM_ADDR_SIZE-1 downto 0); 
-    BCID_Addr_out       : OUT   std_logic_vector(RAM_ADDR_SIZE-1 downto 0)
+    -- BCID address
+    BCID_addr_in        : IN    std_logic_vector(RAM_ADDR_SIZE-1 downto 0); 
+    BCID_addr_out       : OUT   std_logic_vector(RAM_ADDR_SIZE-1 downto 0)
   );
 END Data_Processor;
 
@@ -80,7 +80,7 @@ ARCHITECTURE a OF Data_Processor IS
 
   SHARED VARIABLE state : integer range 0 to 4;
 
-  SIGNAL BCID_Addr : std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
+  SIGNAL BCID_addr : std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
 
   SIGNAL sorter_rst,      : std_logic;
   SIGNAL sorter_data_in   : datatrain;
@@ -105,9 +105,9 @@ BEGIN
       rst       => sorter_rst,
       
       dataIn    => sorter_data_in,
-      dataOut   => sorter_data_out      
+      dataOut   => sorter_data_out,      
       
-      parity    => sorter_parity,
+      parity    => sorter_parity
     );
 
   Counter : counter_8bit
@@ -159,7 +159,7 @@ BEGIN
         -- collect data
         internal_reg  <= data_in;
         internal_size <= data_size;
-        BCID_Addr     <= BCID_Addr_in;
+        BCID_addr     <= BCID_addr_in;
 
         IF (process_ready = '0') THEN -- new data was read in
           -- prep for state 1
@@ -191,7 +191,7 @@ BEGIN
       ELSIF state = 3 THEN
         flagger_data_out  <= data_out;
         process_complete  <= '1';
-        BCID_Addr_out     <= BCID_Addr;
+        BCID_addr_out     <= BCID_addr;
         state := 4;
 
       ELSIF state = 4 THEN

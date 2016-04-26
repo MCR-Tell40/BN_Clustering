@@ -17,29 +17,28 @@ ENTITY construct_datatrain IS
 		
 	);
 
-
 END construct_datatrain;
 
 architecture a of construct_datatrain is
 	-- internal register
-	signal internal_reg : datatrain;
+	signal inter_reg : datatrain;
 begin
 	process(reset)
 	begin
 		if reset = '1' then 
 			-- set internal register to zero
-			internal_reg <= reeset_pattern_train;	
+			inter_reg <= reset_pattern_train;	
 		else 
 			-- load the input datatrain into an internal register
 			-- need to split up and pad with 0's to make 32 bit SPP
 			for i in 0 to 7 loop 
 				for j in 0 to 15 loop
-				internal_reg(16*i + j) := '00000000' & data_in(i)(24*(j+1)-1  downto 24*j)
+				inter_reg(16*i + j) := '00000000' & data_in(i)(24*(j+1)-1  downto 24*j)
 				end loop;
 			end loop;
 		end if;
 		-- offload internal register to output
-		data_out <= internal_reg;
+		data_out <= inter_reg;
 	end process;
 end architecture ; 
 

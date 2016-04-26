@@ -42,12 +42,12 @@ BEGIN
 			inter_reg := reset_patten_train;
 
 		ELSIF rising_edge(clk) THEN
-			FOR i IN 0 to (OVERFLOW_SIZE - 1) LOOP
+			FOR i IN 0 to (MAX_FLAG_SIZE - 2) LOOP
 				-- check even
 				IF ((i mod 2 = 1) AND parity = '1') OR ((i mod 2 = 0) AND parity = '0') THEN
 
 					-- check if switch is required -- sorting by both Chip ID and column
-					IF (to_integer(unsigned(dataIn(i)(23 downto 14))) > to_integer(unsigned(dataIn(i+1)(23 downto 14)))) THEN
+					IF (to_integer(unsigned(dataIn(i)(23 downto 14))) < to_integer(unsigned(dataIn(i+1)(23 downto 14)))) THEN
 						-- make switch
 						inter_reg(i) 	:= dataIn(i+1);
 						inter_reg(i+1) 	:= dataIn(i);
@@ -61,7 +61,7 @@ BEGIN
 
 			IF parity = '1' THEN
 				inter_reg(0) := dataIn(0);
-				inter_reg(OVERFLOW_SIZE) := dataIn(OVERFLOW_SIZE);
+				inter_reg(MAX_FLAG_SIZE - 1 ) := dataIn(MAX_FLAG_SIZE - 1);
 			END IF;
 			dataOut <= inter_reg;
 		END IF;
