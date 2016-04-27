@@ -10,10 +10,10 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 ENTITY counter_8bit IS
 	PORT(
-		clk : 	IN std_logic;
-		rst : 	IN std_logic;
-		en  :	IN std_logic;
-		count : OUT std_logic_vector(7 downto 0)
+		clk 	: IN std_logic;
+		rst 	: IN std_logic;
+		en  	: IN std_logic;
+		count 	: OUT std_logic_vector(7 downto 0)
 		);
 END ENTITY;
 
