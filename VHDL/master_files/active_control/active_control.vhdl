@@ -160,7 +160,7 @@ BEGIN
 				rd_data_store <= 'Full Data train' -- sudo code
 
 				-- prep for next state
-				rd_state := rd_state + 1;
+				rd_state := 2;
 				rd_processor_num := rd_processor_num + 1;
 
 			ELSIF rd_state = 2 THEN
@@ -197,7 +197,7 @@ BEGIN
 
 	-- continious input assignment	
 	rd_addr <= rd_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(rd_itteration, sppram_rd_address_size - 1));
-	rd_data <= rd_data_split(rd_itteration);
+	rd_data_split(rd_itteration) <= rd_data;
 
 	PROCESS(rst,clk) -- data out process
 	BEGIN
@@ -250,6 +250,6 @@ BEGIN
 	
 	-- continious output assignment	
 	wr_addr <= wr_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(wr_wr_itteration, sppram_wr_address_size - 1));
-	wr_data <= wr_data_split(wr_wr_itteration);
+	wr_data <= wr_data_split(wr_itteration);
 
 end a;
