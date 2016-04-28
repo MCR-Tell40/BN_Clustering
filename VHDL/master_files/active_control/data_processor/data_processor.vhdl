@@ -27,10 +27,12 @@ ENTITY Data_Processor IS
     clk	  : IN    std_logic; --clk
     
     -- Data transfer
-    data_in     : IN 	  dataTrain; --data_in
-    data_out    : OUT 	dataTrain; --data_out
-    data_size   : IN    std_logic_vector(7 downto 0);
-    
+    data_in        : IN 	dataTrain; --data_in
+    data_out       : OUT 	dataTrain; --data_out
+    data_size_in   : IN   std_logic_vector(DATA_SIZE_MAX_BIT - 1 downto 0);
+    data_size_out  : OUT  std_logic_vector(DATA_SIZE_MAX_BIT - 1 downto 0);
+
+
     -- Data processor active flag
     process_ready       : INOUT std_logic;
     process_complete    : INOUT std_logic;
@@ -60,7 +62,7 @@ ARCHITECTURE a OF Data_Processor IS
     clk   :   IN std_logic;
     rst   :   IN std_logic;
     en    :   IN std_logic;
-    count :   OUT std_logic_vector(7 downto 0)
+    count :   OUT std_logic_vector(DATA_SIZE_MAX_BIT - 1 downto 0)
     );
   END COMPONENT;
 
@@ -76,7 +78,7 @@ ARCHITECTURE a OF Data_Processor IS
   -- Internal Signals
   SIGNAL internal_clk   : std_logic;
   SIGNAL internal_reg   : datatrain;
-  SIGNAL internal_size  : std_logic_vector(7 downto 0); 
+  SIGNAL internal_size  : std_logic_vector(DATA_SIZE_MAX_BIT-1 downto 0); 
 
   SHARED VARIABLE state : integer range 0 to 4;
 
@@ -89,7 +91,7 @@ ARCHITECTURE a OF Data_Processor IS
   
   SIGNAL counter_rst    : std_logic;
   SIGNAL counter_en     : std_logic;
-  SIGNAL counter_value  : std_logic_vector(7 downto 0);
+  SIGNAL counter_value  : std_logic_vector(DATA_SIZE_MAX_BIT-1 downto 0);
 
   SIGNAL flagger_rst      : std_logic;     
   SIGNAL flagger_data_in  : datatrain;
@@ -158,7 +160,7 @@ BEGIN
 
         -- collect data
         internal_reg  <= data_in;
-        internal_size <= data_size;
+        internal_size <= data_size_in;
         BCID_addr     <= BCID_addr_in;
 
         IF (process_ready = '0') THEN -- new data was read in
@@ -189,9 +191,10 @@ BEGIN
         state := 3;
 
       ELSIF state = 3 THEN
-        flagger_data_out  <= data_out;
+        data_out  <= flagger_data_out;  
         process_complete  <= '1';
         BCID_addr_out     <= BCID_addr;
+        data_size_out <= internal_size; -- propogate size across
         state := 4;
 
       ELSIF state = 4 THEN

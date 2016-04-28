@@ -13,14 +13,14 @@ ENTITY counter_8bit IS
 		clk 	: IN std_logic;
 		rst 	: IN std_logic;
 		en  	: IN std_logic;
-		count 	: OUT std_logic_vector(7 downto 0)
+		count 	: OUT std_logic_vector(DATA_SIZE_MAX_BIT - 1 downto 0)
 		);
 END ENTITY;
 
 
 ARCHITECTURE a OF counter_8bit IS
 
-		SIGNAL inter_reg : std_logic_vector(7 downto 0);
+		SIGNAL inter_reg : std_logic_vector(DATA_SIZE_MAX_BIT - 1 downto 0);
 	
 BEGIN
 

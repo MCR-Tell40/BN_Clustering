@@ -16,10 +16,6 @@ ENTITY Flagger IS
    	clk				: in 	std_logic;
    	data_in			: in 	datatrain;
    	data_out		: out 	datatrain
-
-   	-- add input that is number of spp in datatrain in that is given so that can adjust what is an edge case and what isn't
-   	-- if input size != max size need to cycle through rest of the data in and pass straight across
-
   );
 
  END ENTITY;
@@ -39,29 +35,38 @@ BEGIN
 
 		ELSIF rising_edge(clk) THEN
 
-
+			-- propogate first and last SPP - these are always edge cases, so not flagged
 			inter_reg(0) := data_in(0);
 			inter_reg(MAX_FLAG_SIZE-1) := data_in(MAX_FLAG_SIZE-1);
 
-
 			FOR i IN 1 to (MAX_FLAG_SIZE - 2) LOOP
-
-				IF (to_integer(unsigned(data_in(i)(13 downto 8))) - to_integer(unsigned(data_in(i-1)(13 downto 8))) > 1) AND 
-					(to_integer(unsigned(data_in(i+1)(13 downto 8))) - to_integer(unsigned(data_in(i)(13 downto 8))) > 1) THEN
-
-					inter_reg(i) := data_in(i) OR x"80_00_00";
-
-				ELSE
+			
+				-- if next SPP is all zeros, must be edge case, so don't flag
+				IF ((data_in(i+1) = x"00_00_00_00") THEN
 
 					inter_reg(i) := data_in(i);
 
-				END IF;
+				ELSE 
 
+					-- check if isolated by seeing if neighbouring BCID signals are present 
+					IF (to_integer(unsigned(data_in(i)(13 downto 8))) - to_integer(unsigned(data_in(i-1)(13 downto 8))) > 1) AND 
+						(to_integer(unsigned(data_in(i+1)(13 downto 8))) - to_integer(unsigned(data_in(i)(13 downto 8))) > 1) THEN
+
+						inter_reg(i) := data_in(i) OR x"80_00_00";
+
+					ELSE
+
+						inter_reg(i) := data_in(i);
+
+					END IF;
+				END IF;
 			END LOOP;
 
 		END IF;
 
+		-- pass internal register to the output
 		data_out <= inter_reg;
 
 	END PROCESS;
 END a;
+

@@ -109,18 +109,24 @@ PACKAGE Detector_Constant_Declaration IS
   constant skip_BXID_jump               : std_logic_vector(11 downto 0)   := X"00C";
 --
   -- Event Isolation Flagging
-  constant MAX_FLAG_SIZE        : INTEGER := 128; -- max significant bit
-  constant IF_WORD_SIZE         : INTEGER := 24; -- ?
-  constant RAM_ADDR_SIZE        : INTEGER := 9;
+  CONSTANT MAX_FLAG_SIZE        : INTEGER := 128; -- max significant bit
+  CONSTANT IF_WORD_SIZE         : INTEGER := 24; 
+  CONSTANT RAM_ADDR_SIZE        : INTEGER := 9;
   CONSTANT data_processor_count : INTEGER := 16;
 
   CONSTANT RD_WORD_SIZE         : INTEGER := 384;
   CONSTANT RD_SPP_SIZE          : INTEGER := 24;
   CONSTANT RD_SPP_PER_BCID      : INTEGER := 512;
+  CONSTANT RD_RAM_ADDR_SIZE     : INTEGER := ;
 
   CONSTANT WR_WORD_SIZE         : INTEGER := 512;
   CONSTANT WR_SPP_SIZE          : INTEGER := 32;
   CONSTANT WR_SPP_PER_BCID      : INTEGER := 512;
+  CONSTANT WR_RAM_ADDR_SIZE     : INTEGER := ;
+
+  CONSTANT COUNT_RAM_WORD_SIZE  : INTEGER := 9;
+
+  CONSTANT DATA_SIZE_MAX_BIT    : INTEGER := 8;
 
 
 END Detector_Constant_Declaration;

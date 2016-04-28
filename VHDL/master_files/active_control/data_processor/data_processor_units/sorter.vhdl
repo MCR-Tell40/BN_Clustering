@@ -1,11 +1,10 @@
 -- Bubble Sort Comparator
-
 -- This entity takes a datatrain input and outputs the datatrain one bubblesort itteration later.
-
 -- Even defined by parity of LSB
-
+-- Output is in descending order, highest BCID at top -- this is so padding 0's in datatrain all at bottom 
 -- Author Ben Jeffrey, Nicholas Mead
 -- Date Created 19/11/2015
+
 
 -- IEEE VHDL standard library:
 LIBRARY ieee;
