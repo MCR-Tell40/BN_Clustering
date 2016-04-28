@@ -107,11 +107,11 @@ BEGIN
 
 		IF (rst = '1') THEN
 
+			FIF0_wr_en <= '0'
 			rd_en <= '0';
+			wr_en <= '0';
 
 			ct_addr <= '0X000';
-
-			FIF0_wr_en <= '0'
 
 			rd_state := 0;
 
@@ -250,12 +250,7 @@ BEGIN
 	END PROCESS;
 	
 	-- continious output assignment	
-<<<<<<< HEAD
-	wr_addr <= wr_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(wr_wr_itteration, sppram_wr_address_size - 1));
-	wr_data <= wr_data_split(wr_itteration);
-=======
 	wr_addr <= wr_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(wr_iteration, sppram_wr_address_size - 1));
 	wr_data <= wr_data_split(wr_iteration);
->>>>>>> 0bf976769561276f96fe8b81d7e36f9f83043344
 
 end a;
