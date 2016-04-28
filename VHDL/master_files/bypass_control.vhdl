@@ -14,9 +14,9 @@ ENTITY Bypass_Control IS
 
 	GENERIC(
 
-		ADDR_PER_RAM : INTEGER := 32;
-		MAX_RAM_ADDR_STORE : INTEGER := 512;
-		SPP_PER_ADDR : INTEGER := 16
+		ADDR_PER_RAM 		: INTEGER := 32;
+		MAX_RAM_ADDR_STORE 	: INTEGER := 512;
+		SPP_PER_ADDR 		: INTEGER := 16
 
 		);
 
@@ -27,99 +27,127 @@ ENTITY Bypass_Control IS
 		-- Router Interface
 		rd_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
 		rd_en	:	OUT std_logic;
-		rd_buff :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		rd_data :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
 
 		-- MEP Interface
 		wr_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
 		wr_en	:	OUT std_logic;
-		wr_buff :	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		wr_data :	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
 
 		-- Bypass Interace
 		FIFO_rd_en 	:	OUT std_logic;
-		FIFO_buff	:	IN  std_logic_vector (6 downto 0)
+		FIFO_data	:	IN  std_logic_vector (6 downto 0)
+		FIFO_empty  : 	IN 	std_logic; 
 	);
 
 END Bypass_Control;
 
 ARCHITECTURE a OF Bypass_Control IS
 
-	VARIABLE current_bcid : INTEGER 0 to ADDR_PER_RAM - 1;
-	VARIABLE current_rd_cycle : INTEGER 0 to (MAX_RAM_ADDR_STORE/SPP_PER_ADDR) -1;
-	VARIABLE current_wr_cycle : INTEGER 0 to (MAX_RAM_ADDR_STORE/SPP_PER_ADDR) -1;
-	VARIABLE state : INTEGER 0;
+	SIGNAL bcid 			: std_logic_vector(8 downto 0);
+	VARIABLE spp_count 		: INTEGER;
+	VARIABLE rd_itteration 	: INTEGER 0 to (MAX_RAM_ADDR_STORE/SPP_PER_ADDR) -1;
+	VARIABLE wr_itteration 	: INTEGER 0 to (MAX_RAM_ADDR_STORE/SPP_PER_ADDR) -1;
+	VARIABLE state 			: INTEGER 0;
 
-	SIGNAL data_in  : std_logic_vector(**constant** downto 0);
-	SIGNAL data_out : std_logic_vector(**constant** downto 0);
+	SIGNAL inter_reg : std_logic_vector(**need to calc** downto 0);
 
 BEGIN
+
+	rd_addr <= bcid(4 downto 0) & std_logic_vector(to_unsigned(rd_itteration, sppram_rd_address_size - 1));
+	wr_addr <= bcid(4 downto 0) & std_logic_vector(to_unsigned(wr_itteration, sppram_rd_address_size - 1));
 
 	PROCESS(clk, rst, en)
 	BEGIN
 	
 		IF rst = '1' OR en = '0' THEN
 
-			current_bcid := 0;
-			current_read_cycle := 0;
-			state := 0;
+			bcid 				<= (others => '0');
+			current_read_cycle 	:= 0;
+			state 				:= 0;
 
-			rd_en <= '0';
-			wr_en <= '0';
-			FIFO_rd_en <= '0';
+			rd_en 		<= '0';
+			wr_en 		<= '0';
+			FIFO_rd_en 	<= '0';
 
 		ELSIF rising_edge(clk) THEN
 
-			IF state  = 0 THEN -- prep state
-				-- prep for state 1
+			IF state = '0' THEN
+				-- pre state 1
 				FIFO_rd_en <= '1';
+				state := 1;
 
-			ELSIF state = 1 THEN -- desicion state
-				-- decide if BCID needs to be bypassed
-				IF FIFO_buff > 0 THEN
-					-- bypass
-					FIFO_rd_en <= '0'
-					rd_en <= '1'
+			ELSIF state = 1 THEN
+
+				spp_count := to_integer(unsigned(FIFO_data));
+
+				wr_en <= '0' -- for when state returns to 1 from 4
+
+				IF to_integer(unsigned(FIFO_data)) > 0 THEN
+					-- stop reading FIFO, stare bypassing
+					FIFO_rd_en <= '0';
+					rd_en <= '1';
+					rd_itteration := 0;
 					state := 2;
 
 				ELSE
-					-- next bcid
-					current_bcid := current_bcid + 1;
-				END IF;
+					--re-do state for next bcid
+					bcid <= bcid + "1";
 
-			ELSIF state = 2 THEN -- bypass first read in
+				END
 
-				data_in <= rd_buff;
-				current_rd_cycle := 1;
-				state := 3;
+			ELSIF state = 2 THEN
 
-			ELSIF state = 3 THEN -- first data padding bypass
+				FOR i IN 1 TO 15 LOOP
 
-				FOR i IN 0 to NUMBER_OF_SPP_IN_RAM_ADDR - 1 LOOP
-					data_out(i + 31 downto i) <= '0X00' & data_in(i + 23 downto 0);
+					inter_reg(((i * 32) - 1 ) downto ((i - 1) * 32) ) <= '0X00' & rd_data(((i * 24) - 1)  downto ((i - 1) * 24));
+
 				END LOOP;
 
-				data_in <= rd_buff;
+				IF (rd_itteration + 1) * 8 >= spp_count THEN
 
-				IF current_rd_cycle > FIFO_buff / NUMBER_OF_SPP_IN_RAM_ADDR THEN
-					state := finalstate;
+					rd_en <= '0';
+					state := 4;
+
 				ELSE
-					state := 4
-				END
+
+					rd_itteration := rd_itteration + 1;
+					state := 3;
+				END IF;
+
+			ELSIF state = 3 THEN
+
+				wr_en <= '1'
+				wr_data <= inter_reg;
+				wr_itteration := rd_itteration - 1;
+
+				FOR i IN 1 TO 15 LOOP
+
+					inter_reg(((i * 32) - 1 ) downto ((i - 1) * 32) ) <= '0X00' & rd_data(((i * 24) - 1)  downto ((i - 1) * 24));
+
+				END LOOP;
+
+				IF (rd_itteration + 1) * 8 >= spp_count THEN
+
+					rd_en <= '0';
+					state := 4;
+
+				ELSE
+
+					rd_itteration := rd_itteration + 1;
+					state := 3;
+				END IF;
 
 			ELSIF state = 4 THEN
 
-				wr_buff <= data_out;
 				wr_en <= '1';
+				wr_data <= inter_reg';
+				wr_itteration <= rd_itteration;
 
-				FOR i IN 0 to NUMBER_OF_SPP_IN_RAM_ADDR - 1 LOOP
-					data_out(i + 31 downto i) <= '0X00' & data_in(i + 23 downto 0);
-				END LOOP;
+				FIFO_rd_en <= '1'; -- ready for state 1
+				state := 1;
 
-				data_in <= rd_buff;
-
-
-
-
-
+			END IF;
 
 		END IF;
 
@@ -127,3 +155,9 @@ BEGIN
 
 
 END a;
+
+
+
+FOR i IN 0 to NUMBER_OF_SPP_IN_RAM_ADDR - 1 LOOP
+					data_out(i + 31 downto i) <= '0X00' & data_in(i + 23 downto 0);
+				END LOOP;
