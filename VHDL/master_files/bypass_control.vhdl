@@ -50,7 +50,7 @@ ARCHITECTURE a OF Bypass_Control IS
 	VARIABLE wr_itteration 	: INTEGER 0 to (MAX_RAM_ADDR_STORE/SPP_PER_ADDR) -1;
 	VARIABLE state 			: INTEGER 0;
 
-	SIGNAL inter_reg : std_logic_vector(**need to calc** downto 0);
+	SIGNAL inter_reg : std_logic_vector(**NEED_CONSTANT** downto 0); ------------------------------------- << need const for this << -----------------------------------
 
 BEGIN
 
