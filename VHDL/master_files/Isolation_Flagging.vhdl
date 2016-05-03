@@ -32,7 +32,7 @@ ENTITY isolation_flagging IS
 		-- Bypass Interace
 		FIFO_rd_en 	:	OUT std_logic;
 		FIFO_data	:	IN  std_logic_vector (6 downto 0)
-		FIFO_empty  : 	IN 	std_logic;
+		FIFO_empty  : 	IN 	std_logic
 
 	);
 
@@ -90,7 +90,7 @@ ARCHITECTURE a OF isolation_flagging IS
 			-- Bypass Interace
 			FIFO_wr_en 	:	OUT std_logic;
 			FIFO_data	:	OUt std_logic_vector (6 downto 0)
-			bypass_en 	: 	OUT STD_LOGIC;
+			bypass_en 	: 	OUT STD_LOGIC
 		   );
 	END COMPONENT;
 
@@ -144,8 +144,8 @@ ARCHITECTURE a OF isolation_flagging IS
 
 			-- Bypass Interace
 			FIFO_rd_en 	:	OUT std_logic;
-			FIFO_data	:	IN  std_logic_vector (6 downto 0)
-			FIFO_empty  : 	IN 	std_logic; 
+			FIFO_data	:	IN  std_logic_vector (6 downto 0);
+			FIFO_empty  : 	IN 	std_logic 
 		);
 
 	END COMPONENT;

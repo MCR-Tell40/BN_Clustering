@@ -37,7 +37,7 @@ ENTITY Bypass_Control IS
 		-- Bypass Interace
 		FIFO_rd_en 	:	OUT std_logic;
 		FIFO_data	:	IN  std_logic_vector (6 downto 0)
-		FIFO_empty  : 	IN 	std_logic; 
+		FIFO_empty  : 	IN 	std_logic
 	);
 
 END Bypass_Control;
@@ -94,7 +94,7 @@ BEGIN
 					--re-do state for next bcid
 					bcid <= bcid + "1";
 
-				END
+				END IF;
 
 			ELSIF state = 2 THEN
 
@@ -158,6 +158,6 @@ END a;
 
 
 
-FOR i IN 0 to NUMBER_OF_SPP_IN_RAM_ADDR - 1 LOOP
-					data_out(i + 31 downto i) <= '0X00' & data_in(i + 23 downto 0);
-				END LOOP;
+--FOR i IN 0 to NUMBER_OF_SPP_IN_RAM_ADDR - 1 LOOP
+--					data_out(i + 31 downto i) <= '0X00' & data_in(i + 23 downto 0);
+--				END LOOP;
