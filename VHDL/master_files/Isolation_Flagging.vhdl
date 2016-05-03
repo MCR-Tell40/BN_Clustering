@@ -39,7 +39,9 @@ ENTITY isolation_flagging IS
 END isolation_flagging;
 
 ARCHITECTURE a OF isolation_flagging IS
-
+	
+	VARIABLE clk_count : natural;
+	
 	---------- ---------- SIGNALS ---------- ----------
 	SIGNAL inter_clk, inter_rst : STD_LOGIC;
 
@@ -229,5 +231,28 @@ BEGIN
     	wr_en 	<= ac_wr_en_pipe;    	
 
     END IF;
+
+    process(rst, clk)
+
+    	IF rst = '1' THEN
+    		clk_count := 0;
+    		ac_en_pipe <= '0';
+    	ELSIF rising_edge(clk) THEN
+
+    		IF clk_count < BUFFER_LIFETIME-1 THEN
+    			ac_en_pipe <= '1';
+    			clk_count := clk_count + 1;
+    		ELSE
+    			ac_en_pipe <= '0';
+    			clk_count := 0;
+    		END IF;
+
+    	END IF;
+
+    END process;
+
+
+
+
 
 end a;

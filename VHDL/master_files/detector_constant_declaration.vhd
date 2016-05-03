@@ -121,6 +121,7 @@ PACKAGE Detector_Constant_Declaration IS
   CONSTANT WR_WORD_SIZE         : INTEGER := 512;
   CONSTANT WR_SPP_SIZE          : INTEGER := 32;
   CONSTANT WR_SPP_PER_BCID      : INTEGER := 512;
+  CONSTANT BUFFER_LIFETIME      : INTEGER := 2048;
 
 
 END Detector_Constant_Declaration;
