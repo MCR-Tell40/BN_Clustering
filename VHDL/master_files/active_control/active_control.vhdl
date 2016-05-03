@@ -32,7 +32,8 @@ ENTITY Active_Control IS
 
 		-- Bypass Interace
 		FIFO_wr_en 	:	OUT std_logic;
-		FIFO_data	:	OUt std_logic_vector (6 downto 0)
+		FIFO_data	:	OUt std_logic_vector (6 downto 0);
+		bypass_en 	: 	OUT STD_LOGIC;
 	);
 
 END Active_Control;
