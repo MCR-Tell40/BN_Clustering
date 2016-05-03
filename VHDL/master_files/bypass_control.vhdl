@@ -46,16 +46,16 @@ ARCHITECTURE a OF Bypass_Control IS
 
 	SIGNAL bcid 			: std_logic_vector(8 downto 0);
 	VARIABLE spp_count 		: INTEGER;
-	VARIABLE rd_itteration 	: INTEGER 0 to (MAX_RAM_ADDR_STORE/SPP_PER_ADDR) -1;
-	VARIABLE wr_itteration 	: INTEGER 0 to (MAX_RAM_ADDR_STORE/SPP_PER_ADDR) -1;
-	VARIABLE state 			: INTEGER 0;
+	VARIABLE rd_itteration 	: INTEGER RANGE 0 to (RD_SPP_PER_BCID*RD_SPP_SIZE/RD_WORD_SIZE) -1;
+	VARIABLE wr_itteration 	: INTEGER RANGE 0 to (WR_SPP_PER_BCID*WR_SPP_SIZE/WR_WORD_SIZE) -1;
+	VARIABLE state 			: INTEGER := 0;
 
 	SIGNAL inter_reg : std_logic_vector(**NEED_CONSTANT** downto 0); ------------------------------------- << need const for this << -----------------------------------
 
 BEGIN
 
-	rd_addr <= bcid(4 downto 0) & std_logic_vector(to_unsigned(rd_itteration, sppram_rd_address_size - 1));
-	wr_addr <= bcid(4 downto 0) & std_logic_vector(to_unsigned(wr_itteration, sppram_rd_address_size - 1));
+	rd_addr <= bcid(4 downto 0) & std_logic_vector(to_unsigned(rd_itteration, RD_RAM_ADDR_SIZE - 5));
+	wr_addr <= bcid(4 downto 0) & std_logic_vector(to_unsigned(wr_itteration, WR_RAM_ADDR_SIZE - 5));
 
 	PROCESS(clk, rst, en)
 	BEGIN
@@ -155,7 +155,6 @@ BEGIN
 
 
 END a;
-
 
 
 --FOR i IN 0 to NUMBER_OF_SPP_IN_RAM_ADDR - 1 LOOP
