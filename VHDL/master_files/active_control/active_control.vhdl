@@ -14,7 +14,7 @@ ENTITY Active_Control IS
 
 	PORT(
 		-- standard
-		clk, rst : IN std_logic;
+		clk, rst, en : IN std_logic;
 
 		-- Router Interface
 		rd_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
@@ -103,10 +103,10 @@ BEGIN
 			);
 	END GENERATE GEN_processors;
 
-	PROCESS(rst, clk) -- data in process
+	PROCESS(rst, clk, en) -- data in process
 	BEGIN
 
-		IF (rst = '1') THEN
+		IF (rst = '1' OR en = '0') THEN
 
 			FIF0_wr_en <= '0'
 			rd_en <= '0';

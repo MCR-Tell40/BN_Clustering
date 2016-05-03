@@ -52,6 +52,7 @@ ARCHITECTURE a OF isolation_flagging IS
 	SIGNAL FIFO_wr_data_pipe, FIFO_rd_data_pipe :  std_logic_vector (6 downto 0);
 
 	-- active controll pipes
+	SIGNAL ac_en_pipe;
 	SIGNAL ac_rd_addr_pipe, 	ac_wr_addr_pipe : 	std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
 	SIGNAL ac_rd_data_pipe, 	ac_wr_data_pipe :	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
 	SIGNAL ac_rd_en_pipe, 		ac_wr_en_pipe 	:	std_logic;
@@ -66,9 +67,10 @@ ARCHITECTURE a OF isolation_flagging IS
 	COMPONENT active_control IS
 		PORT(
 			-- Common control signals
-		    rst			: IN    std_logic; -- rst
-		    clk 		: IN    std_logic; -- clk-- Control entity for dataprocessing the BCID's below the sort threshord AND ahead of schedual
-		    
+		    clk 		: IN    std_logic; 
+		    rst			: IN    std_logic; 
+		    en 			: IN 	STD_LOGIC;
+
 		    -- Router Interface
 			rd_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
 			rd_en	:	OUT std_logic;
@@ -152,6 +154,7 @@ BEGIN
     PORT MAP (
 	    clk       => inter_clk,
 	    rst       => inter_rst,
+	    en 		  => ac_en_pipe,
 
 	    rd_addr 	=> ac_rd_addr_pipe,
 		rd_en		=> ac_rd_en_pipe,
