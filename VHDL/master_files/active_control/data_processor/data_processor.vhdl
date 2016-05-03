@@ -37,9 +37,9 @@ ENTITY Data_Processor IS
     process_ready       : INOUT std_logic;
     process_complete    : INOUT std_logic;
 
-    -- BCID address
-    BCID_addr_in        : IN    std_logic_vector(RAM_ADDR_SIZE-1 downto 0); 
-    BCID_addr_out       : OUT   std_logic_vector(RAM_ADDR_SIZE-1 downto 0)
+    -- BCID address //////// Is this the Ram address or the actual bcid? if ram address could/should be different for in and out
+    BCID_addr_in        : IN    std_logic_vector(8 downto 0); 
+    BCID_addr_out       : OUT   std_logic_vector(8 downto 0)
   );
 END Data_Processor;
 
@@ -54,6 +54,7 @@ ARCHITECTURE a OF Data_Processor IS
       clk           : in   std_logic;
       data_in       : in   dataTrain;
       data_out      : out  dataTrain
+
     );
   END COMPONENT;
 
@@ -82,7 +83,7 @@ ARCHITECTURE a OF Data_Processor IS
 
   SHARED VARIABLE state : integer range 0 to 4;
 
-  SIGNAL BCID_addr : std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
+  SIGNAL BCID_addr : std_logic_vector(8 downto 0);
 
   SIGNAL sorter_rst,      : std_logic;
   SIGNAL sorter_data_in   : datatrain;
@@ -110,6 +111,7 @@ BEGIN
       dataOut   => sorter_data_out,      
       
       parity    => sorter_parity
+
     );
 
   Counter : counter_8bit
