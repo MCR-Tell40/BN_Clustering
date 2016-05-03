@@ -25,14 +25,14 @@ ENTITY Bypass_Control IS
 		clk, rst, en : IN std_logic;
 
 		-- Router Interface
-		rd_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
+		rd_addr : 	OUT std_logic_vector ( RD_RAM_ADDR_SIZE - 1 downto 0);
 		rd_en	:	OUT std_logic;
-		rd_data :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		rd_data :	IN 	std_logic_vector ( RD_WORD_SIZE -1 downto 0);
 
 		-- MEP Interface
-		wr_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
+		wr_addr : 	OUT std_logic_vector ( WR_RAM_ADDR_SIZE - 1 downto 0);
 		wr_en	:	OUT std_logic;
-		wr_data :	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		wr_data :	OUT	std_logic_vector ( WR_WORD_SIZE - 1 downto 0);
 
 		-- Bypass Interace
 		FIFO_rd_en 	:	OUT std_logic;
@@ -156,7 +156,3 @@ BEGIN
 
 END a;
 
-
---FOR i IN 0 to NUMBER_OF_SPP_IN_RAM_ADDR - 1 LOOP
---					data_out(i + 31 downto i) <= '0X00' & data_in(i + 23 downto 0);
---				END LOOP;
