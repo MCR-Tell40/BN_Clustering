@@ -127,6 +127,7 @@ PACKAGE Detector_Constant_Declaration IS
   CONSTANT COUNT_RAM_WORD_SIZE  : INTEGER := 9;
 
   CONSTANT DATA_SIZE_MAX_BIT    : INTEGER := 8;
+  CONSTANT BUFFER_LIFETIME      : INTEGER := 2048;
 
 
 END Detector_Constant_Declaration;

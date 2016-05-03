@@ -14,7 +14,7 @@ ENTITY Active_Control IS
 
 	PORT(
 		-- standard
-		clk, rst : IN std_logic;
+		clk, rst, en : IN std_logic;
 
 		-- Router Interface
 		rd_addr : 	OUT std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
@@ -32,7 +32,8 @@ ENTITY Active_Control IS
 
 		-- Bypass Interace
 		FIFO_wr_en 	:	OUT std_logic;
-		FIFO_data	:	OUt std_logic_vector (6 downto 0)
+		FIFO_data	:	OUt std_logic_vector (6 downto 0);
+		bypass_en 	: 	OUT STD_LOGIC;
 	);
 
 END Active_Control;
@@ -40,7 +41,7 @@ END Active_Control;
 ARCHITECTURE a OF Active_Control IS
 
 	-- in process variables
-	SHARED VARIABLE rd_state 			: INTEGER range 0 to 4;
+	SHARED VARIABLE rd_state 			: INTEGER;
 	SHARED VARIABLE rd_data_store 		: datatrain;
 	SHARED VARIABLE rd_processor_num 	: INTEGER range 0 to data_processor_count-1;
 	SHARED VARIABLE rd_bcid_store		: std_logic_vector(8 downto 0);
@@ -48,7 +49,7 @@ ARCHITECTURE a OF Active_Control IS
 	SHARED VARIABLE rd_iteration 		: INTEGER range 0 to 7;
 
 	-- out process variables
-	SHARED VARIABLE wr_state 			: INTEGER range 0 to 4;
+	SHARED VARIABLE wr_state 			: INTEGER;
 	SHARED VARIABLE wr_processor_num 	: INTEGER range 0 to data_processor_count-1;
 	SHARED VARIABLE wr_data_store 		: datatrain;
 	SHARED VARIABLE wr_bcid_store		: std_logic_vector(8 downto 0);
@@ -59,7 +60,7 @@ ARCHITECTURE a OF Active_Control IS
 		PORT(
 			-- Common control signals
 		    rst				: IN    std_logic; -- rst
-		    clk 			: IN    std_logic; -- clk
+		    clk 			: IN    std_logic; -- clk-- Control entity for dataprocessing the BCID's below the sort threshord AND ahead of schedual
 		    
 		    -- Data transfer
 		    data_in     	: IN 	dataTrain; -- data in
@@ -79,7 +80,10 @@ ARCHITECTURE a OF Active_Control IS
 	END COMPONENT;
 
 BEGIN
-	
+
+	SIGNAL processor_complete 	: std_logic_vector(data_processor_count-1 downto 0);
+	SIGNAL processor_ready 		: std_logic_vector(data_processor_count-1 downto 0);
+		
 	GEN_processors: for I in 0 to data_processor_count-1 GENERATE
 		processor_X: data_processor port map(
 			rst,
@@ -102,20 +106,22 @@ BEGIN
 			);
 	END GENERATE GEN_processors;
 
-	PROCESS(rst, clk) -- data in process
+	PROCESS(rst, clk, en) -- data in process
 	BEGIN
 
-		IF (rst = '1') THEN
-
-			rd_en <= '0';
-
-			ct_addr <= '0X000';
+		IF (rst = '1' OR en = '0') THEN
 
 			FIF0_wr_en <= '0'
+			rd_en <= '0';
+			wr_en <= '0';
+
+			ct_addr <= '0X000';
 
 			rd_state := 0;
 
 			rd_processor_num := 0;
+
+			bypass_en <= '0';
 
 		ELSIF rising_edge(clk) THEN
 
@@ -161,7 +167,7 @@ BEGIN
 				rd_data_store <= 'Full Data train' -- sudo code
 
 				-- prep for next state
-				rd_state := rd_state + 1;
+				rd_state := 2;
 				rd_processor_num := rd_processor_num + 1;
 
 			ELSIF rd_state = 2 THEN
@@ -182,15 +188,17 @@ BEGIN
 						rd_addr <= rd_addr + 1;
 					END IF;
 					
-					IF ct_addr = '0X1FF' THEN
-						ct_addr <= '0X000';
+					IF ct_addr = MAX_ADDR THEN
+						rd_state := 3; -- state with no logic
 					ELSE
 						ct_addr <= ct_addr + 1;
+						rd_state := 0;
+					
 					END IF;
 
-					rd_state := 0;
 
 				END IF;
+
 			END IF;
 		END IF;
 
@@ -198,7 +206,8 @@ BEGIN
 
 	-- continious input assignment	
 	rd_addr <= rd_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(rd_iteration, RD_RAM_ADDR_SIZE - 5));
-	rd_data <= rd_data_split(rd_iteration);
+	rd_data_split(rd_itteration) <= rd_data;
+
 
 	PROCESS(rst,clk) -- data out process
 	BEGIN
@@ -211,7 +220,6 @@ BEGIN
 		ELSIF rising_edge(clk) THEN
 
 			IF wr_state = 0 THEN -- look for finished processor
-
 
 				IF process_complete(wr_processor_num) = '1' THEN
 
@@ -252,5 +260,11 @@ BEGIN
 	-- continuous output assignment	
 	wr_addr <= wr_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(wr_iteration, WR_RAM_ADDR_SIZE - 5));
 	wr_data <= wr_data_split(wr_iteration);
+
+	IF processor_ready = '0XFFFFFFFF' AND rd_state = 3 THEN -- active controll complete
+
+		bypass_en <= '1';
+
+	END IF;
 
 end a;
