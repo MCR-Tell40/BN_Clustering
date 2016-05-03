@@ -19,7 +19,7 @@ ENTITY Active_Control IS
 		-- Router Interface
 		rd_addr : 	OUT std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
 		rd_en	:	OUT std_logic;
-		rd_data :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		rd_data :	IN 	std_logic_vector ( RD_WORD_SIZE - 1  downto 0);
 
 		-- Train Size RAM interface ct=count
 		ct_addr : 	OUT std_logic_vector ( 8 downto 0);
@@ -28,7 +28,7 @@ ENTITY Active_Control IS
 		-- MEP Interface
 		wr_addr : 	OUT std_logic_vector ( WR_RAM_ADDR_SIZE-1 downto 0);
 		wr_en	:	OUT std_logic;
-		wr_data :	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		wr_data :	OUT	std_logic_vector ( WR_WORD_SIZE -1 downto 0);
 
 		-- Bypass Interace
 		FIFO_wr_en 	:	OUT std_logic;
