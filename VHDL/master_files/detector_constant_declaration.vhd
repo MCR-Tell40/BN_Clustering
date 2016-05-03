@@ -107,12 +107,13 @@ PACKAGE Detector_Constant_Declaration IS
   constant swap_BXID                    : std_logic_vector(5 downto 0)    := "000000";
   constant swap_BXID_interval           : std_logic_vector(15 downto 0)   := X"0641";
   constant skip_BXID_jump               : std_logic_vector(11 downto 0)   := X"00C";
---
+
   -- Event Isolation Flagging
-  CONSTANT MAX_FLAG_SIZE        : INTEGER := 128; -- max significant bit
+  -- Note: If used to make a std_logic_vector, use (CONSTANT - 1 downto 0)
+  CONSTANT MAX_FLAG_SIZE        : INTEGER := 128;
   CONSTANT IF_WORD_SIZE         : INTEGER := 24; 
   CONSTANT RAM_ADDR_SIZE        : INTEGER := 9;
-  CONSTANT data_processor_count : INTEGER := 16;
+  CONSTANT DATA_PROCESSOR_COUNT : INTEGER := 16;
 
   CONSTANT RD_WORD_SIZE         : INTEGER := 384;
   CONSTANT RD_SPP_SIZE          : INTEGER := 24;

@@ -55,10 +55,10 @@ ARCHITECTURE a OF isolation_flagging IS
 
 	-- active controll pipes
 	SIGNAL ac_en_pipe;
-	SIGNAL ac_rd_addr_pipe	 					: 	std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
-	SIGNAL ac_wr_addr_pipe						: 	std_logic_vector(WR_RAM_ADDR_SIZE-1 downto 0);
-	SIGNAL ac_rd_data_pipe 						: 	std_logic_vector (RD_WORD_SIZE - 1 downto 0);
-	SIGNAL ac_wr_data_pipe						: 	std_logic_vector(WR_WORD_SIZE - 1 downto 0);
+	SIGNAL ac_rd_addr_pipe	 					: 	std_logic_vector( RD_RAM_ADDR_SIZE-1 downto 0);
+	SIGNAL ac_wr_addr_pipe						: 	std_logic_vector( WR_RAM_ADDR_SIZE-1 downto 0);
+	SIGNAL ac_rd_data_pipe 						: 	std_logic_vector( RD_WORD_SIZE - 1 downto 0);
+	SIGNAL ac_wr_data_pipe						: 	std_logic_vector( WR_WORD_SIZE - 1 downto 0);
 	SIGNAL ac_rd_en_pipe, 		ac_wr_en_pipe 	:	std_logic;
 	SIGNAL bypass_en_pipe 						: 	std_logic;
 

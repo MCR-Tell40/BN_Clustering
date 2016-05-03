@@ -37,7 +37,7 @@ ENTITY Data_Processor IS
     process_ready       : INOUT std_logic;
     process_complete    : INOUT std_logic;
 
-    -- BCID address //////// Is this the Ram address or the actual bcid? if ram address could/should be different for in and out
+    -- BCID address
     BCID_addr_in        : IN    std_logic_vector(8 downto 0); 
     BCID_addr_out       : OUT   std_logic_vector(8 downto 0)
   );

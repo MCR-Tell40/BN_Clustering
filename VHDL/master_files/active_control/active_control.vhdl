@@ -33,7 +33,7 @@ ENTITY Active_Control IS
 		-- Bypass Interace
 		FIFO_wr_en 	:	OUT std_logic;
 		FIFO_data	:	OUt std_logic_vector (6 downto 0);
-		bypass_en 	: 	OUT STD_LOGIC;
+		bypass_en 	: 	OUT STD_LOGIC
 	);
 
 END Active_Control;
@@ -43,14 +43,14 @@ ARCHITECTURE a OF Active_Control IS
 	-- in process variables
 	SHARED VARIABLE rd_state 			: INTEGER;
 	SHARED VARIABLE rd_data_store 		: datatrain;
-	SHARED VARIABLE rd_processor_num 	: INTEGER range 0 to data_processor_count-1;
+	SHARED VARIABLE rd_processor_num 	: INTEGER range 0 to DATA_PROCESSOR_COUNT-1;
 	SHARED VARIABLE rd_bcid_store		: std_logic_vector(8 downto 0);
 	SHARED VARIABLE rd_size_store		: std_logic_vector(7 downto 0);
 	SHARED VARIABLE rd_iteration 		: INTEGER range 0 to 7;
 
 	-- out process variables
 	SHARED VARIABLE wr_state 			: INTEGER;
-	SHARED VARIABLE wr_processor_num 	: INTEGER range 0 to data_processor_count-1;
+	SHARED VARIABLE wr_processor_num 	: INTEGER range 0 to DATA_PROCESSOR_COUNT-1;
 	SHARED VARIABLE wr_data_store 		: datatrain;
 	SHARED VARIABLE wr_bcid_store		: std_logic_vector(8 downto 0);
 	SHARED VARIABLE wr_size_store		: std_logic_vector(7 downto 0);
@@ -81,10 +81,10 @@ ARCHITECTURE a OF Active_Control IS
 
 BEGIN
 
-	SIGNAL processor_complete 	: std_logic_vector(data_processor_count-1 downto 0);
-	SIGNAL processor_ready 		: std_logic_vector(data_processor_count-1 downto 0);
+	SIGNAL processor_complete 	: std_logic_vector(DATA_PROCESSOR_COUNT-1 downto 0);
+	SIGNAL processor_ready 		: std_logic_vector(DATA_PROCESSOR_COUNT-1 downto 0);
 		
-	GEN_processors: for I in 0 to data_processor_count-1 GENERATE
+	GEN_processors: for I in 0 to DATA_PROCESSOR_COUNT-1 GENERATE
 		processor_X: data_processor port map(
 			rst,
 		    clk,
@@ -127,7 +127,7 @@ BEGIN
 
 			IF rd_state = 0 THEN
 
-				IF ct_data <= OVERFLOW_SIZE AND ct_data != '0X000' THEN
+				IF ct_data <= MAX_FLAG_SIZE AND ct_data != '0X000' THEN
 
 					-- mark as processed
 					FIFO_data <= (OTHERS => '0');
