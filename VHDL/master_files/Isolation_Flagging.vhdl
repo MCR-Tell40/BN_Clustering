@@ -205,7 +205,7 @@ BEGIN
 		FIFO_empty  => FIFO_empty_pipe
     );
 
-    IF bypass_en = '1' THEN
+    IF bypass_en_pipe = '1' THEN
 
     	rd_addr <= by_rd_addr_pipe;
     	rd_data <= by_rd_data_pipe;
