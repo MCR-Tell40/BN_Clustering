@@ -41,7 +41,7 @@ END Active_Control;
 ARCHITECTURE a OF Active_Control IS
 
 	-- in process variables
-	SHARED VARIABLE rd_state 			: INTEGER range 0 to 4;
+	SHARED VARIABLE rd_state 			: INTEGER;
 	SHARED VARIABLE rd_data_store 		: datatrain;
 	SHARED VARIABLE rd_processor_num 	: INTEGER range 0 to data_processor_count-1;
 	SHARED VARIABLE rd_bcid_store		: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
@@ -49,7 +49,7 @@ ARCHITECTURE a OF Active_Control IS
 	SHARED VARIABLE rd_iteration 		: INTEGER range 0 to 7;
 
 	-- out process variables
-	SHARED VARIABLE wr_state 			: INTEGER range 0 to 4;
+	SHARED VARIABLE wr_state 			: INTEGER;
 	SHARED VARIABLE wr_processor_num 	: INTEGER range 0 to data_processor_count-1;
 	SHARED VARIABLE wr_data_store 		: datatrain;
 	SHARED VARIABLE wr_addr_store		: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
@@ -80,7 +80,10 @@ ARCHITECTURE a OF Active_Control IS
 	END COMPONENT;
 
 BEGIN
-	
+
+	SIGNAL processor_complete 	: std_logic_vector(data_processor_count-1 downto 0);
+	SIGNAL processor_ready 		: std_logic_vector(data_processor_count-1 downto 0);
+		
 	GEN_processors: for I in 0 to data_processor_count-1 GENERATE
 		processor_X: data_processor port map(
 			rst,
@@ -117,6 +120,8 @@ BEGIN
 			rd_state := 0;
 
 			rd_processor_num := 0;
+
+			bypass_en <= '0';
 
 		ELSIF rising_edge(clk) THEN
 
@@ -183,15 +188,17 @@ BEGIN
 						rd_addr <= rd_addr + 1;
 					END IF;
 					
-					IF ct_addr = '0X1FF' THEN
-						ct_addr <= '0X000';
+					IF ct_addr = MAX_ADDR THEN
+						rd_state := 3; -- state with no logic
 					ELSE
 						ct_addr <= ct_addr + 1;
+						rd_state := 0;
+					
 					END IF;
 
-					rd_state := 0;
 
 				END IF;
+
 			END IF;
 		END IF;
 
@@ -212,7 +219,6 @@ BEGIN
 		ELSIF rising_edge(clk) THEN
 
 			IF wr_state = 0 THEN -- look for finished processor
-
 
 				IF process_complete(wr_processor_num) = '1' THEN
 
@@ -253,5 +259,11 @@ BEGIN
 	-- continious output assignment	
 	wr_addr <= wr_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(wr_iteration, sppram_wr_address_size - 1));
 	wr_data <= wr_data_split(wr_iteration);
+
+	IF processor_ready = '0XFFFFFFFF' AND rd_state = 3 THEN -- active controll complete
+
+		bypass_en <= '1';
+
+	END IF;
 
 end a;
