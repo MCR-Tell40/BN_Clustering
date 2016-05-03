@@ -16,18 +16,18 @@ ENTITY isolation_flagging IS
 		-- standard
 		clk, rst : IN std_logic;
 
-		rd_addr 	: 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
+		rd_addr 	: 	OUT std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
 		rd_en		:	OUT std_logic;
-		rd_data 	:	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		rd_data 	:	IN 	std_logic_vector ( RD_WORD_SIZE downto 0);
 
 		-- Train Size RAM interface ct=count
-		ct_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
-		ct_data :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		ct_addr : 	OUT std_logic_vector ( 8 downto 0);
+		ct_data :	IN 	std_logic_vector ( COUNT_RAM_WORD_SIZE - 1 downto 0);
 
 		-- MEP Interface
-		wr_addr 	: 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
+		wr_addr 	: 	OUT std_logic_vector ( WR_RAM_ADDR_SIZE-1 downto 0);
 		wr_en		:	OUT std_logic;
-		wr_data 	:	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+		wr_data 	:	OUT	std_logic_vector ( WR_WORD_SIZE - 1 downto 0);
 
 		-- Bypass Interace
 		FIFO_rd_en 	:	OUT std_logic;
@@ -46,8 +46,8 @@ ARCHITECTURE a OF isolation_flagging IS
 	SIGNAL inter_clk, inter_rst : STD_LOGIC;
 
 	-- count ram pipes
-	SIGNAL ct_addr_pipe : 	std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
-	SIGNAL ct_data_pipe :	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+	SIGNAL ct_addr_pipe : 	std_logic_vector ( 8 downto 0);
+	SIGNAL ct_data_pipe :	std_logic_vector ( COUNT_RAM_WORD_SIZE - 1 downto 0);
 
 	-- fifo pipes
 	SIGNAL FIFO_wr_en_pipe, FIFO_rd_en_pipe, FIFO_empty_pipe : STD_LOGIC;
@@ -55,14 +55,18 @@ ARCHITECTURE a OF isolation_flagging IS
 
 	-- active controll pipes
 	SIGNAL ac_en_pipe;
-	SIGNAL ac_rd_addr_pipe, 	ac_wr_addr_pipe : 	std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
-	SIGNAL ac_rd_data_pipe, 	ac_wr_data_pipe :	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+	SIGNAL ac_rd_addr_pipe	 					: 	std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
+	SIGNAL ac_wr_addr_pipe						: 	std_logic_vector(WR_RAM_ADDR_SIZE-1 downto 0);
+	SIGNAL ac_rd_data_pipe 						: 	std_logic_vector (RD_WORD_SIZE - 1 downto 0);
+	SIGNAL ac_wr_data_pipe						: 	std_logic_vector(WR_WORD_SIZE - 1 downto 0);
 	SIGNAL ac_rd_en_pipe, 		ac_wr_en_pipe 	:	std_logic;
-	SIGNAL bypass_en_pipe 						: 	STD_LOGIC;
+	SIGNAL bypass_en_pipe 						: 	std_logic;
 
 	-- Bypass controll pipes
-	SIGNAL by_rd_addr_pipe, 	by_wr_addr_pipe : 	std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
-	SIGNAL by_rd_data_pipe, 	by_wr_data_pipe :	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+	SIGNAL by_rd_addr_pipe 						: 	std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
+	SIGNAL by_wr_addr_pipe 						: 	std_logic_vector ( WR_RAM_ADDR_SIZE-1 downto 0);
+	SIGNAL by_rd_data_pipe 						: 	std_logic_vector ( RD_WORD_SIZE - 1 downto 0);
+	SIGNAL by_wr_data_pipe 						:	std_logic_vector ( WR_WORD_SIZE - 1 downto 0);
 	SIGNAL by_rd_en_pipe, 		by_wr_en_pipe 	:	std_logic;
 	---------- ---------- COMPONENTS ---------- ----------
 
@@ -71,26 +75,26 @@ ARCHITECTURE a OF isolation_flagging IS
 			-- Common control signals
 		    clk 		: IN    std_logic; 
 		    rst			: IN    std_logic; 
-		    en 			: IN 	STD_LOGIC;
+		    en 			: IN 	std_logic;
 
 		    -- Router Interface
-			rd_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
+			rd_addr : 	OUT std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
 			rd_en	:	OUT std_logic;
-			rd_data :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+			rd_data :	IN 	std_logic_vector ( RD_WORD_SIZE - 1 downto 0);
 
 			-- Train Size RAM interface ct=count
-			ct_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
-			ct_data :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+			ct_addr : 	OUT std_logic_vector ( 8 downto 0);
+			ct_data :	IN 	std_logic_vector ( COUNT_RAM_WORD_SIZE - 1 downto 0);
 
 			-- MEP Interface
-			wr_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
+			wr_addr : 	OUT std_logic_vector ( WR_RAM_ADDR_SIZE-1 downto 0);
 			wr_en	:	OUT std_logic;
-			wr_data :	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+			wr_data :	OUT	std_logic_vector ( WR_WORD_SIZE - 1 downto 0);
 
 			-- Bypass Interace
 			FIFO_wr_en 	:	OUT std_logic;
-			FIFO_data	:	OUt std_logic_vector (6 downto 0)
-			bypass_en 	: 	OUT STD_LOGIC
+			FIFO_data	:	OUt std_logic_vector (6 downto 0);
+			bypass_en 	: 	OUT std_logic
 		   );
 	END COMPONENT;
 
@@ -133,14 +137,14 @@ ARCHITECTURE a OF isolation_flagging IS
 			clk, rst, en : IN std_logic;
 
 			-- Router Interface
-			rd_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
+			rd_addr : 	OUT std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
 			rd_en	:	OUT std_logic;
-			rd_data :	IN 	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+			rd_data :	IN 	std_logic_vector ( RD_WORD_SIZE - 1 downto 0);
 
 			-- MEP Interface
-			wr_addr : 	OUT std_logic_vector ( RAM_ADDR_SIZE-1 downto 0);
+			wr_addr : 	OUT std_logic_vector ( WR_RAM_ADDR_SIZE-1 downto 0);
 			wr_en	:	OUT std_logic;
-			wr_data :	OUT	std_logic_vector ( (IF_WORD_LENGTH*32)-1 downto 0);
+			wr_data :	OUT	std_logic_vector ( WR_WORD_SIZE - 1 downto 0);
 
 			-- Bypass Interace
 			FIFO_rd_en 	:	OUT std_logic;
