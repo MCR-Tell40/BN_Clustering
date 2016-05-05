@@ -188,9 +188,7 @@ BEGIN
 
 				FIFO_wr_en <= '0';
 			
-				FOR i IN 0 TO 24*to_integer(unsigned(ct_data))/RD_WORD_SIZE - 1 LOOP
-					rd_data_store(to_integer(unsigned(ct_data))*rd_iteration + i) <= '00000000' & rd_data(24*(i+1)-1  downto 24*i);
-				END LOOP;
+
 
 				rd_iteration = rd_iteration + 1;
 
@@ -236,7 +234,9 @@ BEGIN
 
 	-- continious input assignment	
 	rd_addr <= rd_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(rd_iteration, RD_RAM_ADDR_SIZE - 5));
-
+	FOR i IN 0 TO 24*to_integer(unsigned(ct_data))/RD_WORD_SIZE - 1 LOOP
+		rd_data_store(to_integer(unsigned(ct_data))*rd_iteration + i) <= '00000000' & rd_data(24*(i+1)-1  downto 24*i);
+	END LOOP;
 
 	PROCESS(rst,clk) -- data out process
 	BEGIN
