@@ -145,6 +145,7 @@ BEGIN
 			rd_processor_num := 0;
 
 			bypass_en <= '0';
+			rd_iteration := 0;
 
 		ELSIF rising_edge(clk) THEN
 
@@ -272,7 +273,7 @@ BEGIN
 			ELSIF wr_state = 1 THEN -- read out 
 
 				-- check if last itteration
-				IF wr_iteration*16 >= wr_size_store THEN
+				IF wr_iteration*16 >= to_integer(unsigned(wr_size_store)) THEN
 					state := 0;
 					wr_en <= '0'
 				ELSE
@@ -287,7 +288,7 @@ BEGIN
 	
 	-- continuous output assignment	
 	wr_addr <= wr_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(wr_iteration, WR_RAM_ADDR_SIZE - 5));
-	wr_data <= wr_data_split(wr_iteration);
+	wr_data <= wr_data_store(wr_iteration);
 
 	IF processor_ready = '0XFFFFFFFF' AND rd_state = 3 THEN -- active controll complete
 
