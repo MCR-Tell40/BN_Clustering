@@ -187,8 +187,6 @@ BEGIN
 			ELSIF rd_state = 1 THEN
 
 				FIFO_wr_en <= '0';
-			
-
 
 				rd_iteration = rd_iteration + 1;
 
