@@ -46,15 +46,20 @@ ARCHITECTURE a OF Active_Control IS
 	SHARED VARIABLE rd_processor_num 	: INTEGER range 0 to DATA_PROCESSOR_COUNT-1;
 	SHARED VARIABLE rd_bcid_store		: std_logic_vector(8 downto 0);
 	SHARED VARIABLE rd_size_store		: std_logic_vector(7 downto 0);
-	SHARED VARIABLE rd_iteration 		: INTEGER range 0 to 7;
 
+
+	-- for data formatting
+	SHARED VARIABLE rd_construct_store 	: datatrain_rd;
+	SHARED VARIABLE wr_destruct_store 	: datatrain_wr;
+	SHARED VARIABLE rd_iteration 		: INTEGER range 0 to 7;
+	SHARED VARIABLE wr_iteration 		: INTEGER range 0 to 7;
+	
 	-- out process variables
 	SHARED VARIABLE wr_state 			: INTEGER;
 	SHARED VARIABLE wr_processor_num 	: INTEGER range 0 to DATA_PROCESSOR_COUNT-1;
 	SHARED VARIABLE wr_data_store 		: datatrain;
 	SHARED VARIABLE wr_bcid_store		: std_logic_vector(8 downto 0);
 	SHARED VARIABLE wr_size_store		: std_logic_vector(7 downto 0);
-	SHARED VARIABLE wr_iteration 		: INTEGER range 0 to 7;
 
 	COMPONENT data_processor IS
 		PORT(
@@ -78,6 +83,24 @@ ARCHITECTURE a OF Active_Control IS
 		    BCID_out       	: OUT   std_logic_vector(8 downto 0)
 		   );
 	END COMPONENT;
+
+	---- Data formatting compontents, where exactly does this go?
+	--COMPONENT split_datatrain IS 
+	--PORT(
+	--	data_in : IN datatrain;			-- 128 x 1 32-bit-SPP
+	--	reset 	: IN std_logic;
+	--	data_out: OUT datatrain_wr		-- 8 x 16 32-bit-SPP 
+	--	);
+	--END COMPONENT;
+
+	--COMPONENT construct_datatrain IS
+	--PORT(
+	--	data_in : IN datatrain_rd;		-- 8 x 16 24-bit-SPP
+	--	reset 	: IN std_logic;
+	--	data_out: OUT datatrain			-- 128 x 1 32-bit-SPP
+	--	);
+	--END COMPONENT;
+
 
 BEGIN
 
@@ -139,6 +162,7 @@ BEGIN
 
 					-- read data in
 					rd_state := 1;
+					rd_iteration := 0;
 				ELSE
 
 					-- flag for bypass
@@ -162,13 +186,18 @@ BEGIN
 			ELSIF rd_state = 1 THEN
 
 				FIFO_wr_en <= '0';
+			
+				FOR i IN 0 TO 24*to_integer(unsigned(ct_data))/RD_WORD_SIZE - 1 LOOP
+					rd_data_store(to_integer(unsigned(ct_data))*rd_iteration + i) <= rd_data(24*(i+1)-1  downto 24*i);
+				END LOOP;
 
-				-- Bens read from ram code goes here
-				rd_data_store <= 'Full Data train' -- sudo code
+				rd_iteration = rd_iteration + 1;
 
 				-- prep for next state
-				rd_state := 2;
-				rd_processor_num := rd_processor_num + 1;
+				IF rd_iteration = to_integer(unsigned(ct_data))/RD_WORD_SIZE THEN
+					rd_state := 2;
+					rd_processor_num := rd_processor_num + 1;
+				END IF;
 
 			ELSIF rd_state = 2 THEN
 
@@ -206,7 +235,6 @@ BEGIN
 
 	-- continious input assignment	
 	rd_addr <= rd_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(rd_iteration, RD_RAM_ADDR_SIZE - 5));
-	rd_data_split(rd_itteration) <= rd_data;
 
 
 	PROCESS(rst,clk) -- data out process
