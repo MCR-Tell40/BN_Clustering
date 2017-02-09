@@ -6,8 +6,8 @@ LIBRARY ieee;
 use IEEE.numeric_std.all;
 USE ieee.std_logic_1164.all;
 
-USE work.Detector_Constant_Declaration.all
-USE work.Isolation_Flagging_Package.all
+USE work.Detector_Constant_Declaration.all;
+USE work.Isolation_Flagging_Package.all;
 
 ENTITY split_datatrain IS
 	PORT(
@@ -33,7 +33,7 @@ begin
 			-- need to split up into individual SPPs
 			for i in 0 to 7 loop 
 				for j in 0 to 15 loop
-					inter_reg(i)(((j+1)*32)-1 downto 32*j) := data_in(16*i + j)
+					inter_reg(i)(((j+1)*32)-1 downto 32*j) <= data_in(16*i + j);
 				END loop;
 			end loop;
 		end if;

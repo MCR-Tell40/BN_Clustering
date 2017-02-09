@@ -6,7 +6,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 use work.Isolation_Flagging_Package.all;
-USE IEEE.STD_LOGIC_ARITH.ALL;
+--USE IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 USE work.Detector_Constant_Declaration.all;
 
@@ -17,12 +17,12 @@ ENTITY Active_Control IS
 		clk, rst, en : IN std_logic;
 
 		-- Router Interface
-		rd_addr : 	OUT std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
+		rd_addr : 	INOUT std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
 		rd_en	:	OUT std_logic;
 		rd_data :	IN 	std_logic_vector ( RD_WORD_SIZE - 1  downto 0);
 
 		-- Train Size RAM interface ct=count
-		ct_addr : 	OUT std_logic_vector ( 8 downto 0);
+		ct_addr : 	INOUT std_logic_vector ( 8 downto 0);
 		ct_data :	IN 	std_logic_vector ( COUNT_RAM_WORD_SIZE - 1  downto 0);
 
 		-- MEP Interface
@@ -100,16 +100,17 @@ ARCHITECTURE a OF Active_Control IS
 	--	data_out: OUT datatrain			-- 128 x 1 32-bit-SPP
 	--	);
 	--END COMPONENT;
-
-
-BEGIN
-
 	SIGNAL processor_complete 	: std_logic_vector(DATA_PROCESSOR_COUNT-1 downto 0);
 	SIGNAL processor_ready 		: std_logic_vector(DATA_PROCESSOR_COUNT-1 downto 0);
+	
+BEGIN
+
+
 		
 	GEN_processors: for I in 0 to DATA_PROCESSOR_COUNT-1 GENERATE
+	begin		
 		processor_X: data_processor port map(
-			rst,
+		    rst,
 		    clk,
 		    
 		    -- Data transfer
@@ -134,11 +135,11 @@ BEGIN
 
 		IF (rst = '1' OR en = '0') THEN
 
-			FIF0_wr_en <= '0'
+			FIF0_wr_en <= '0';
 			rd_en <= '0';
 			wr_en <= '0';
 
-			ct_addr <= '0X000';
+			ct_addr <= "0X000";
 
 			rd_state := 0;
 
@@ -151,14 +152,14 @@ BEGIN
 
 			IF rd_state = 0 THEN
 
-				IF ct_data <= MAX_FLAG_SIZE AND ct_data != '0X000' THEN
+				IF (ct_data <= MAX_FLAG_SIZE) AND (ct_data /= "0X000") THEN
 
 					-- mark as processed
 					FIFO_data <= (OTHERS => '0');
 					FIFO_wr_en <= '1';
 
 					-- store addr and size
-					rd_bcid_store <= ct_addr;
+					rd_bcid_store := ct_addr;
 					rd_size_store <= ct_data;
 
 					-- read data in
@@ -171,14 +172,14 @@ BEGIN
 					FIFO_wr_en <= '1';
 
 					-- prep for next addr
-					IF rd_addr = '0X1FF' THEN
-						rd_addr <= '0X000';
+					IF rd_addr = "0X1FF" THEN
+						rd_addr <= "0X000";
 					ELSE
 						rd_addr <= rd_addr + 1;
 					END IF;
 					
-					IF ct_addr = '0X1FF' THEN
-						ct_addr <= '0X000';
+					IF ct_addr = "0X1FF" THEN
+						ct_addr <= "0X000";
 					ELSE
 						ct_addr <= ct_addr + 1;
 					END IF;
@@ -188,7 +189,7 @@ BEGIN
 
 				FIFO_wr_en <= '0';
 
-				rd_iteration = rd_iteration + 1;
+				rd_iteration <= rd_iteration + 1;
 
 				-- prep for next state
 				IF rd_iteration = to_integer(unsigned(ct_data))/RD_WORD_SIZE THEN
@@ -208,8 +209,8 @@ BEGIN
 					processor_ready 	(rd_processor_num) <= '0';
 
 					-- prep for next addr
-					IF rd_addr = '0X1FF' THEN
-						rd_addr <= '0X000';
+					IF rd_addr = "0X1FF" THEN
+						rd_addr <= "0X000";
 					ELSE
 						rd_addr <= rd_addr + 1;
 					END IF;
@@ -232,10 +233,12 @@ BEGIN
 
 	-- continious input assignment	
 	rd_addr <= rd_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(rd_iteration, RD_RAM_ADDR_SIZE - 5));
+process
+begin
 	FOR i IN 0 TO 24*to_integer(unsigned(ct_data))/RD_WORD_SIZE - 1 LOOP
-		rd_data_store(to_integer(unsigned(ct_data))*rd_iteration + i) <= '00000000' & rd_data(24*(i+1)-1  downto 24*i);
+		rd_data_store(to_integer(unsigned(ct_data))*rd_iteration + i) <= "00000000" & rd_data(24*(i+1)-1  downto 24*i);
 	END LOOP;
-
+end process;
 	PROCESS(rst,clk) -- data out process
 	BEGIN
 
@@ -252,8 +255,8 @@ BEGIN
 
 					-- collect from processor
 					wr_data_store <= processor_out(wr_processor_num);
-					wr_size_store <= processor_size_out(wr_processor_num);
-					wr_bcid_store <= processor_bcid_out(wr_processor_num);
+					wr_size_store := processor_size_out(wr_processor_num);
+					wr_bcid_store := processor_bcid_out(wr_processor_num);
 
 					-- signal collection
 					processor_complete(wr_processor_num) <= '0';
@@ -272,8 +275,8 @@ BEGIN
 
 				-- check if last itteration
 				IF wr_iteration*16 >= to_integer(unsigned(wr_size_store)) THEN
-					state := 0;
-					wr_en <= '0'
+					wr_state := 0;
+					wr_en <= '0';
 				ELSE
 					wr_iteration := wr_iteration + 1;
 				END IF;
@@ -288,10 +291,12 @@ BEGIN
 	wr_addr <= wr_bcid_store(4 downto 0) & std_logic_vector(to_unsigned(wr_iteration, WR_RAM_ADDR_SIZE - 5));
 	wr_data <= wr_data_store(wr_iteration);
 
+process
+begin
 	IF processor_ready = '0XFFFFFFFF' AND rd_state = 3 THEN -- active controll complete
 
 		bypass_en <= '1';
 
 	END IF;
-
+end process;
 end a;

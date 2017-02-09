@@ -85,7 +85,7 @@ ARCHITECTURE a OF Data_Processor IS
 
   SIGNAL BCID_addr : std_logic_vector(8 downto 0);
 
-  SIGNAL sorter_rst,      : std_logic;
+  SIGNAL sorter_rst      : std_logic;
   SIGNAL sorter_data_in   : datatrain;
   SIGNAL sorter_data_out  : datatrain;
   SIGNAL sorter_parity    : std_logic;
@@ -102,19 +102,19 @@ BEGIN
   ------------------------------------------------------------------
   ---------------------- Port Mapping ------------------------------ 
 
-  Sorter : Sorter
+  Sorter1 : Sorter
     PORT MAP (
       clk       => internal_clk,
       rst       => sorter_rst,
       
-      dataIn    => sorter_data_in,
-      dataOut   => sorter_data_out,      
+      data_in    => sorter_data_in,
+      data_out   => sorter_data_out,      
       
       parity    => sorter_parity
 
     );
 
-  Counter : counter_8bit
+  Counter1 : counter_8bit
     PORT MAP (
       clk   => internal_clk,
       rst   => counter_rst,
@@ -123,7 +123,7 @@ BEGIN
       count => counter_value
       );
 
-  Flagger : Flagger
+  Flagger1 : Flagger
     PORT MAP (
       clk         => internal_clk,
       rst         => flagger_rst,

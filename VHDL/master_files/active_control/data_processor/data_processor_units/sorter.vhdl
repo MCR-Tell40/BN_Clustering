@@ -37,8 +37,8 @@ BEGIN
 
 		IF rst = '1' THEN
 
-			dataOut <= reset_patten_train;
-			inter_reg := reset_patten_train;
+			dataOut <= reset_pattern_train;
+			inter_reg := reset_pattern_train;
 
 		ELSIF rising_edge(clk) THEN
 			FOR i IN 0 to (MAX_FLAG_SIZE - 2) LOOP

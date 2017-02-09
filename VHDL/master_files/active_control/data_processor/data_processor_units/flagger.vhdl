@@ -31,7 +31,7 @@ BEGIN
 
 		IF rst = '1' THEN
 
-			data_out <= reset_patten_train;
+			data_out <= reset_pattern_train;
 
 		ELSIF rising_edge(clk) THEN
 
@@ -42,7 +42,7 @@ BEGIN
 			FOR i IN 1 to (MAX_FLAG_SIZE - 2) LOOP
 			
 				-- if next SPP is all zeros, must be edge case, so don't flag
-				IF ((data_in(i+1) = x"00_00_00_00") THEN
+				IF (data_in(i+1) = x"00_00_00_00") THEN
 
 					inter_reg(i) := data_in(i);
 
@@ -52,7 +52,7 @@ BEGIN
 					IF (to_integer(unsigned(data_in(i)(13 downto 8))) - to_integer(unsigned(data_in(i-1)(13 downto 8))) > 1) AND 
 						(to_integer(unsigned(data_in(i+1)(13 downto 8))) - to_integer(unsigned(data_in(i)(13 downto 8))) > 1) THEN
 
-						inter_reg(i) := data_in(i) OR x"80_00_00";
+						inter_reg(i) := data_in(i) OR x"80_00_00_00";
 
 					ELSE
 

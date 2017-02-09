@@ -6,8 +6,8 @@ LIBRARY ieee;
 use IEEE.numeric_std.all;
 USE ieee.std_logic_1164.all;
 
-USE work.Detector_Constant_Declaration.all
-USE work.Isolation_Flagging_Package.all
+USE work.Detector_Constant_Declaration.all;
+USE work.Isolation_Flagging_Package.all;
 
 ENTITY construct_datatrain IS
 	PORT(
@@ -33,7 +33,7 @@ begin
 			-- need to split up and pad with 0's to make 32 bit SPP
 			for i in 0 to 7 loop 
 				for j in 0 to 15 loop
-				inter_reg(16*i + j) := '00000000' & data_in(i)(24*(j+1)-1  downto 24*j)
+					inter_reg(16*i + j) <= "00000000" & data_in(i)(24*(j+1)-1 downto 24*j);
 				end loop;
 			end loop;
 		end if;

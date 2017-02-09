@@ -18,7 +18,7 @@ ENTITY isolation_flagging IS
 
 		rd_addr 	: 	OUT std_logic_vector ( RD_RAM_ADDR_SIZE-1 downto 0);
 		rd_en		:	OUT std_logic;
-		rd_data 	:	IN 	std_logic_vector ( RD_WORD_SIZE downto 0);
+		rd_data 	:	INOUT 	std_logic_vector ( RD_WORD_SIZE -1 downto 0);
 
 		-- Train Size RAM interface ct=count
 		ct_addr : 	OUT std_logic_vector ( 8 downto 0);
@@ -31,7 +31,7 @@ ENTITY isolation_flagging IS
 
 		-- Bypass Interace
 		FIFO_rd_en 	:	OUT std_logic;
-		FIFO_data	:	IN  std_logic_vector (6 downto 0)
+		FIFO_data	:	IN  std_logic_vector (6 downto 0);
 		FIFO_empty  : 	IN 	std_logic
 
 	);
@@ -40,7 +40,7 @@ END isolation_flagging;
 
 ARCHITECTURE a OF isolation_flagging IS
 	
-	VARIABLE clk_count : natural;
+	SHARED VARIABLE clk_count : natural;
 	
 	---------- ---------- SIGNALS ---------- ----------
 	SIGNAL inter_clk, inter_rst : STD_LOGIC;
@@ -54,7 +54,7 @@ ARCHITECTURE a OF isolation_flagging IS
 	SIGNAL FIFO_wr_data_pipe, FIFO_rd_data_pipe :  std_logic_vector (6 downto 0);
 
 	-- active controll pipes
-	SIGNAL ac_en_pipe;
+	SIGNAL ac_en_pipe: std_logic;
 	SIGNAL ac_rd_addr_pipe	 					: 	std_logic_vector( RD_RAM_ADDR_SIZE-1 downto 0);
 	SIGNAL ac_wr_addr_pipe						: 	std_logic_vector( WR_RAM_ADDR_SIZE-1 downto 0);
 	SIGNAL ac_rd_data_pipe 						: 	std_logic_vector( RD_WORD_SIZE - 1 downto 0);
@@ -156,7 +156,7 @@ ARCHITECTURE a OF isolation_flagging IS
 
 BEGIN
 
-	active_control : active_control
+	active_control1 : active_control
     PORT MAP (
 	    clk       => inter_clk,
 	    rst       => inter_rst,
@@ -181,7 +181,7 @@ BEGIN
 		bypass_en 		=> bypass_en_pipe
     );
 
-    interface_FIFO : interface_FIFO
+    interface_FIFO1 : interface_FIFO
     PORT MAP(
     	clk		=> inter_clk,
 		rst		=> inter_rst,
@@ -193,7 +193,7 @@ BEGIN
 		Empty	=> FIFO_empty_pipe
     );
 	
-	bypass_control : bypass_control
+	bypass_control1 : bypass_control
     PORT MAP (
 	    clk 	=> inter_clk,
 	    rst     => inter_rst,
@@ -214,6 +214,8 @@ BEGIN
 		FIFO_empty  => FIFO_empty_pipe
     );
 
+process(clk)
+begin
     IF bypass_en_pipe = '1' THEN
 
     	rd_addr <= by_rd_addr_pipe;
@@ -235,8 +237,9 @@ BEGIN
     	wr_en 	<= ac_wr_en_pipe;    	
 
     END IF;
-
+end process;
     process(rst, clk)
+begin
 
     	IF rst = '1' THEN
     		clk_count := 0;

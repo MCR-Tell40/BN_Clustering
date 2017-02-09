@@ -20,7 +20,7 @@ PACKAGE Isolation_Flagging_Package IS
 	CONSTANT reset_pattern_spp    : std_logic_vector(31 downto 0) := (others => '0');
 	CONSTANT reset_pattern_train  : dataTrain := (others => reset_pattern_spp);
 	
-	CONSTANT reset_pattern_wr	  : std_logic_vector(WR_WORD_SIZE downto 0) := (others => '0');
-	CONSTANT reset_pattern_wrtrain: dataTrain_wr := (others => reset_pattern_train);
+	CONSTANT reset_pattern_wr	  : std_logic_vector(WR_WORD_SIZE - 1 downto 0) := (others => '0');
+	CONSTANT reset_pattern_wrtrain: dataTrain_wr := (others => reset_pattern_wr);
 
 END Isolation_Flagging_Package;

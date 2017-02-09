@@ -7,6 +7,7 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
+USE work.detector_constant_declaration.all;
 
 ENTITY counter_8bit IS
 	PORT(

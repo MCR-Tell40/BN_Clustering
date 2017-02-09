@@ -118,17 +118,19 @@ PACKAGE Detector_Constant_Declaration IS
   CONSTANT RD_WORD_SIZE         : INTEGER := 384;
   CONSTANT RD_SPP_SIZE          : INTEGER := 24;
   CONSTANT RD_SPP_PER_BCID      : INTEGER := 512;
-  CONSTANT RD_RAM_ADDR_SIZE     : INTEGER := ;
+  CONSTANT RD_RAM_ADDR_SIZE     : INTEGER := 128; -- Don't know what value this actually takes
 
   CONSTANT WR_WORD_SIZE         : INTEGER := 512;
   CONSTANT WR_SPP_SIZE          : INTEGER := 32;
   CONSTANT WR_SPP_PER_BCID      : INTEGER := 512;
-  CONSTANT WR_RAM_ADDR_SIZE     : INTEGER := ;
+  CONSTANT WR_RAM_ADDR_SIZE     : INTEGER := 128; -- Don't know what value goes here
 
   CONSTANT COUNT_RAM_WORD_SIZE  : INTEGER := 9;
 
   CONSTANT DATA_SIZE_MAX_BIT    : INTEGER := 8;
   CONSTANT BUFFER_LIFETIME      : INTEGER := 2048;
+  
+  CONSTANT MAX_ADDR : INTEGER := 128; -- UNSURE OF 
 
 
 END Detector_Constant_Declaration;
